@@ -1,0 +1,1 @@
+int expand_macro(char *fileName);

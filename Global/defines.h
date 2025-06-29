@@ -1,0 +1,3 @@
+#define MAX_LINE_LENGTH 81
+#define VALID_STAT 0
+#define NON_VALID_STAT 1
