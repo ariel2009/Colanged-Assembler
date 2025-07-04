@@ -1,6 +1,7 @@
-#include "../Global/structures.h"
-
-#define MCRO_CODE_OFFSET
+typedef struct location{
+    char *file_name;
+    unsigned long line;
+} location;
 
 typedef struct Error{
     unsigned short err_code;

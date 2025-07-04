@@ -1,6 +1,5 @@
 #include <stddef.h>
 #include "Errors.h"
-#include "../Global/structures.h"
 
 Error general_errors[] ={
     {ERR_CODE_1,  "Failed to dynamically allocate memory"},

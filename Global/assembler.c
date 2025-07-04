@@ -1,19 +1,18 @@
 #include <stdlib.h>
 #include "defines.h"
-#include "../Preproccessor//mcro_expan.h"
+#include "../Preproccessor/mcro_expan.h"
 
 int main(int argc, char const *argv[])
 {
-    unsigned short status = VALID_STAT;
+    unsigned short status = SUCCESS;
     if(argc <= 1){
-        status = NON_VALID_STAT;
+        status = ERROR;
         printf("Usage: ./assembler <file1.as> <file2.as> ...");
     }
-    for (int i = 1; i < argc && status == VALID_STAT; i++)
+    for (int i = 1; i < argc && status == SUCCESS; i++)
     {
         char *fileName = *argv[i];
-        if(status = isFileNameValid(*fileName, "as"))
-            expand_macro(*fileName);
+        status = expand_macro(*fileName);
     }
     
     return EXIT_SUCCESS;

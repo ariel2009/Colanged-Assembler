@@ -1,0 +1,1 @@
+char *removeExtraSpaces(char *str);
