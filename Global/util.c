@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "util.h"
 #include "defines.h"
@@ -39,4 +40,15 @@ char *removeExtraSpaces(char *str){
     strcpy(out_str, str);
     
     return out_str;
+}
+
+int isExtraText(char *str, char *token, int preChck, char *afterTok){
+    if(preChck){
+        if((strcmp(strtok(' ', str), token)) == 0 || (strcmp(strtok('\t', str), token)) == 0){
+                afterTok = strtok(NULL, '\n');
+                return ERROR;
+        }
+        return SUCCESS;
+    }
+    return strcmp(strtok('\n', str), token) != 0;
 }

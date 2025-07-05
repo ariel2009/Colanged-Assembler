@@ -12,6 +12,7 @@ int expand_macro(char *fileName){
     int status = SUCCESS;
     FILE *fp;
     char *token;
+    int isInMcro = STATE_OUT;
     location *err_loc = {fileName, 0};
     if(!(fp = tryOpenFile(fileName, "as", "r")))
         return ERROR;
@@ -22,15 +23,35 @@ int expand_macro(char *fileName){
         lineNum++;
         char *no_prepost_spaces_str = removeExtraSpaces(buff);
 
-        if(strstr(no_prepost_spaces_str, MCRO_DECL_TOK)){
-            no_prepost_spaces_str += sizeof(MCRO_DECL_TOK);
-            no_prepost_spaces_str =  removeExtraSpaces(no_prepost_spaces_str);
+        if(!isInMcro){
+            if(strstr(no_prepost_spaces_str, MCRO_DECL_TOK)){
 
-            if(!validate_mcro_decl(no_prepost_spaces_str)){
-                err_loc->line = lineNum;
-                print_mcro_err(err_loc, ERR_CODE_11);
-                status = ERROR;
+                /* Validation */
+                if(!validate_mcro_decl(no_prepost_spaces_str)){
+                    err_loc->line = lineNum;
+                    print_mcro_err(err_loc, ERR_CODE_11);
+                    status = ERROR;
+                }
+                else{
+                    isInMcro = STATE_IN;
+                }
             }
+        }
+        else{
+            if(strstr(no_prepost_spaces_str, MACRO_END_TOK)){
+                char *after_end_tok;
+
+                if(isExtraText(no_prepost_spaces_str, MCRO_DECL_TOK, PRE, after_end_tok) || \
+                isExtraText(after_end_tok, MCRO_DECL_TOK, POST, NULL)){
+                    err_loc->line = lineNum;
+                    print_mcro_err(err_loc, ERR_CODE_12);
+                    status = ERROR;
+                }
+                else{
+
+                }
+            }
+            isInMcro = STATE_OUT;
         }
     }
 
@@ -38,12 +59,23 @@ int expand_macro(char *fileName){
     return status;
 }
 
-int validate_mcro_decl(char *after_mcro_tok){
-    if(strcmp(after_mcro_tok, '\n') == 0)
+int validate_mcro_decl(char *str){
+    char *after_decl_tok;
+
+    if(isExtraText(str, MCRO_DECL_TOK, PRE, after_decl_tok))
         return ERROR;
-    if(isCommand(after_mcro_tok) || isInstruct(after_mcro_tok) || isRegister(after_mcro_tok))
+
+    after_decl_tok = removeExtraSpaces(after_decl_tok);
+    if(strcmp(after_decl_tok, '\n') == 0)
         return ERROR;
-    if(strchr('\t', after_mcro_tok) || strchr(' ', after_mcro_tok))
+    if(isCommand(str) || isInstruct(str) || isRegister(str))
         return ERROR;
+    if(strchr('\t', str) || strchr(' ', str))
+        return ERROR;
+
     return SUCCESS;
+}
+
+int save_mcro(char *name, char *content){
+    
 }

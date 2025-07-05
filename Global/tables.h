@@ -19,6 +19,13 @@ typedef struct command_def{
     unsigned short opcode;
 } command_def;
 
+typedef struct macros
+{
+    char *name;
+    char *content;
+};
+
+
 int isRegister(char *possibleReg);
 int isCommand(char *possibleCmd);
 int isInstruct(char *possibleInst);
