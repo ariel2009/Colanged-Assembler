@@ -18,3 +18,7 @@ typedef struct command_def{
     unsigned int paramCount: 2;
     unsigned short opcode;
 } command_def;
+
+int isRegister(char *possibleReg);
+int isCommand(char *possibleCmd);
+int isInstruct(char *possibleInst);

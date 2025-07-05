@@ -4,9 +4,9 @@
 #include "mcro_expan.h"
 #include "../IO/FileHandler.h"
 #include "../Global/defines.h"
-#include "../ErrorHandling/Errors.h"
-#include "../Global/defines.h"
 #include "../Global/util.h"
+#include "../Global/tables.h"
+#include "../ErrorHandling/Errors.h"
 
 int expand_macro(char *fileName){
     int status = SUCCESS;
@@ -41,5 +41,9 @@ int expand_macro(char *fileName){
 int validate_mcro_decl(char *after_mcro_tok){
     if(strcmp(after_mcro_tok, '\n') == 0)
         return ERROR;
-    
+    if(isCommand(after_mcro_tok) || isInstruct(after_mcro_tok) || isRegister(after_mcro_tok))
+        return ERROR;
+    if(strchr('\t', after_mcro_tok) || strchr(' ', after_mcro_tok))
+        return ERROR;
+    return SUCCESS;
 }
