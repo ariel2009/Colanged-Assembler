@@ -1,3 +1,9 @@
+typedef struct command_def{
+    char *name;
+    unsigned int paramCount: 2;
+    unsigned short opcode;
+} command_def;
+
 typedef struct command{
     command_def *def;
     char *label;
@@ -12,19 +18,6 @@ typedef struct instruction{
     int length;
     unsigned int is_extern: 1;
 } instruction;
-
-typedef struct command_def{
-    char *name;
-    unsigned int paramCount: 2;
-    unsigned short opcode;
-} command_def;
-
-typedef struct macros
-{
-    char *name;
-    char *content;
-};
-
 
 int isRegister(char *possibleReg);
 int isCommand(char *possibleCmd);

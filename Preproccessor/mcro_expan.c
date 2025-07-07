@@ -1,39 +1,44 @@
-#include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "mcro_expan.h"
 #include "../IO/FileHandler.h"
 #include "../Global/defines.h"
 #include "../Global/util.h"
-#include "../Global/tables.h"
+#include "../Global/Data/tables.h"
 #include "../ErrorHandling/Errors.h"
 
 int expand_macro(char *fileName){
-    int status = SUCCESS;
+    int status = SUCCESS, isInMcro = STATE_OUT;
+    unsigned long mcroLinesCount = 0;
     FILE *fp;
-    char *token;
-    int isInMcro = STATE_OUT;
-    location *err_loc = {fileName, 0};
+    fpos_t *mcro_start;
+    char *mcro_name;
+    location *err_loc;
+
     if(!(fp = tryOpenFile(fileName, "as", "r")))
         return ERROR;
 
-    unsigned long lineNum = 0;
+    unsigned long lineCount = 0;
     char buff[MAX_LINE_LENGTH];
     while(fgets(buff, sizeof(buff), fp)){
-        lineNum++;
+        lineCount++;
         char *no_prepost_spaces_str = removeExtraSpaces(buff);
 
         if(!isInMcro){
             if(strstr(no_prepost_spaces_str, MCRO_DECL_TOK)){
 
                 /* Validation */
-                if(!validate_mcro_decl(no_prepost_spaces_str)){
-                    err_loc->line = lineNum;
+                if(!validate_mcro_decl(no_prepost_spaces_str, mcro_name)){
+                    err_loc->line = lineCount;
                     print_mcro_err(err_loc, ERR_CODE_11);
                     status = ERROR;
                 }
                 else{
                     isInMcro = STATE_IN;
+
+                    mcro_start = (fpos_t *)malloc(sizeof(fpos_t));
+                    fgetpos(fp, mcro_start);
                 }
             }
         }
@@ -43,15 +48,19 @@ int expand_macro(char *fileName){
 
                 if(isExtraText(no_prepost_spaces_str, MCRO_DECL_TOK, PRE, after_end_tok) || \
                 isExtraText(after_end_tok, MCRO_DECL_TOK, POST, NULL)){
-                    err_loc->line = lineNum;
+                    err_loc->line = lineCount;
                     print_mcro_err(err_loc, ERR_CODE_12);
+                    free(mcro_start);
                     status = ERROR;
                 }
                 else{
-
+                    save_mcro(mcro_name, mcro_start, fp, mcroLinesCount);
                 }
+                isInMcro = STATE_OUT;
             }
-            isInMcro = STATE_OUT;
+            else{
+                mcroLinesCount++;
+            }
         }
     }
 
@@ -59,7 +68,7 @@ int expand_macro(char *fileName){
     return status;
 }
 
-int validate_mcro_decl(char *str){
+int validate_mcro_decl(char *str, char *out_mcro_name){
     char *after_decl_tok;
 
     if(isExtraText(str, MCRO_DECL_TOK, PRE, after_decl_tok))
@@ -70,12 +79,24 @@ int validate_mcro_decl(char *str){
         return ERROR;
     if(isCommand(str) || isInstruct(str) || isRegister(str))
         return ERROR;
+    
     if(strchr('\t', str) || strchr(' ', str))
         return ERROR;
+    strcpy(out_mcro_name, str);
 
     return SUCCESS;
 }
 
-int save_mcro(char *name, char *content){
-    
+void save_mcro(char *name, fpos_t *mcro_start, FILE *src, unsigned long lineCount){
+    char c, *content;
+    unsigned long i;
+
+    content = (char *)malloc((lineCount-1)*MAX_LINE_LENGTH);
+    fsetpos(src, mcro_start);
+    for (i = 0; i < sizeof(content); i++)
+    {
+        c = getc(src);
+        *(content + i) = c;
+    }
+    /* Need insert to the hash map */
 }

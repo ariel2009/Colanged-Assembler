@@ -1,6 +1,9 @@
 #include <string.h>
+#include <stdlib.h>
+
 #include "tables.h"
-#include "defines.h"
+#include "structures.h"
+#include "../defines.h"
 
 command_def commands[] = {
     {"mov", 0, 2},
@@ -51,4 +54,10 @@ int isRegister(char *possibleReg){
             return ERROR;
     }
     return SUCCESS;
+}
+
+struct hashMap *create_map(){
+    struct hashMap *macros;
+    macros = (struct hashMap*)malloc(sizeof(struct hashMap));
+    return macros;
 }
