@@ -12,13 +12,13 @@ int isFileNameValid(char *fullName, char *ext){
     strtok(*fullName, '.');
 
     char *ext_from_name = strtok(NULL, '.');
-    if(strcmp(*ext_from_name, *ext) != 0 || strtok(NULL, '\n') != '\0'){
+    if(strcmp(*ext_from_name, *ext) != 0 || strcmp(strtok(NULL, '\n'),"\0") != 0){
         print_general_err(NULL, ERR_CODE_2);
         return ERROR;
     }
 
     FILE *fp;
-    if(fp = fopen(*fullName, "w") == NULL){
+    if((fp = fopen(*fullName, "w")) == NULL){
         print_general_err(NULL, ERR_CODE_4);
         return ERROR;
     }

@@ -15,12 +15,18 @@ int expand_macro(char *fileName){
     fpos_t *mcro_start;
     char *mcro_name;
     location *err_loc;
+    hashMap *macros;
+
+    macros = (hashMap *)(sizeof(hashMap));
+    initializeHashMap(macros);
 
     if(!(fp = tryOpenFile(fileName, "as", "r")))
         return ERROR;
 
     unsigned long lineCount = 0;
     char buff[MAX_LINE_LENGTH];
+
+    /* Scanning for macros and saving in the hashMap */
     while(fgets(buff, sizeof(buff), fp)){
         lineCount++;
         char *no_prepost_spaces_str = removeExtraSpaces(buff);
@@ -54,7 +60,7 @@ int expand_macro(char *fileName){
                     status = ERROR;
                 }
                 else{
-                    save_mcro(mcro_name, mcro_start, fp, mcroLinesCount);
+                    save_mcro(mcro_name, mcro_start, fp, mcroLinesCount, &macros);
                 }
                 isInMcro = STATE_OUT;
             }
@@ -63,6 +69,7 @@ int expand_macro(char *fileName){
             }
         }
     }
+
 
     fclose(fp);
     return status;
@@ -87,16 +94,18 @@ int validate_mcro_decl(char *str, char *out_mcro_name){
     return SUCCESS;
 }
 
-void save_mcro(char *name, fpos_t *mcro_start, FILE *src, unsigned long lineCount){
-    char c, *content;
+void save_mcro(char *name, fpos_t *mcro_start, FILE *src, unsigned long lineCount, hashMap **macro_list){
+    char *next_c, *content;
     unsigned long i;
 
     content = (char *)malloc((lineCount-1)*MAX_LINE_LENGTH);
+    next_c = content;
+
     fsetpos(src, mcro_start);
     for (i = 0; i < sizeof(content); i++)
     {
-        c = getc(src);
-        *(content + i) = c;
+        *(next_c + i) = getc(src);
     }
-    /* Need insert to the hash map */
+    
+    insert(*macro_list, name, content);
 }

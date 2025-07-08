@@ -1,5 +1,5 @@
 /* Linked List node */
-struct node {
+typedef struct node {
 
     /* key is string */
     char* key;
@@ -7,16 +7,16 @@ struct node {
     /* value is also string */
     char* value;
     struct node* next;
-};
+} node;
 
-struct hashMap {
+typedef struct hashMap {
 
     /* Current number of elements in hashMap and capacity of hashMap */
     int numOfElements, capacity;
 
     /* hold base address array of linked list */
     struct node** arr;
-};
+} hashMap;
 
 void setNode(struct node* node, char* key, char* value);
 void initializeHashMap(struct hashMap* mp);

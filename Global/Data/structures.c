@@ -4,7 +4,7 @@
 #include "structures.h"
 
 /* like constructor */
-void setNode(struct node* node, char* key, char* value)
+void setNode(node* node, char* key, char* value)
 {
     node->key = key;
     node->value = value;
@@ -13,7 +13,7 @@ void setNode(struct node* node, char* key, char* value)
 };
 
 /* like constructor */
-void initializeHashMap(struct hashMap* mp)
+void initializeHashMap(hashMap* mp)
 {
 
     /* Default capacity in this case */
@@ -21,13 +21,13 @@ void initializeHashMap(struct hashMap* mp)
     mp->numOfElements = 0;
 
     /* array of size = 1 */
-    mp->arr = (struct node**)malloc(sizeof(struct node*)
+    mp->arr = (node**)malloc(sizeof(node*)
                                     * mp->capacity);
     return;
 }
 
 /* Feistel cipher */
-int hashFunction(struct hashMap* mp, char* key)
+int hashFunction(hashMap* mp, char* key)
 {
     int bucketIndex;
     int sum = 0, factor = 31;
@@ -48,15 +48,15 @@ int hashFunction(struct hashMap* mp, char* key)
     return bucketIndex;
 }
 
-void insert(struct hashMap* mp, char* key, char* value)
+void insert(hashMap* mp, char* key, char* value)
 {
 
     /* Getting bucket index for the given key - value pair */
     int bucketIndex = hashFunction(mp, key);
-    struct node* newNode = (struct node*)malloc(
+    node* newNode = (node*)malloc(
 
         /* Creating a new node */
-        sizeof(struct node));
+        sizeof(node));
 
     /* Setting value of node */
     setNode(newNode, key, value);
@@ -79,16 +79,16 @@ void insert(struct hashMap* mp, char* key, char* value)
     return;
 }
 
-void deleteRecord (struct hashMap* mp, char* key)
+void deleteRecord (hashMap* mp, char* key)
 {
 
     /* Getting bucket index for the given key */
     int bucketIndex = hashFunction(mp, key);
 
-    struct node* prevNode = NULL;
+    node* prevNode = NULL;
 
     /* Points to the head of linked list present at bucket index */
-    struct node* currNode = mp->arr[bucketIndex];
+    node* currNode = mp->arr[bucketIndex];
 
     while (currNode != NULL) {
 
@@ -113,14 +113,14 @@ void deleteRecord (struct hashMap* mp, char* key)
     return;
 }
 
-char* search(struct hashMap* mp, char* key)
+char* search(hashMap* mp, char* key)
 {
 
     /* Getting the bucket index for the given key */
     int bucketIndex = hashFunction(mp, key);
 
     /* Head of the linked list present at bucket index */
-    struct node* bucketHead = mp->arr[bucketIndex];
+    node* bucketHead = mp->arr[bucketIndex];
     while (bucketHead != NULL) {
 
         /* Key is found in the hashMap */
@@ -141,8 +141,8 @@ char* search(struct hashMap* mp, char* key)
 // {
 
 //     /* Initialize the value of mp */
-//     struct hashMap* mp
-//         = (struct hashMap*)malloc(sizeof(struct hashMap));
+//     hashMap* mp
+//         = (hashMap*)malloc(sizeof(hashMap));
 //     initializeHashMap(mp);
 
 //     insert(mp, "Yogaholic", "Anjali");
