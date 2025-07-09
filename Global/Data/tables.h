@@ -1,7 +1,7 @@
 typedef struct command_def{
     char *name;
+    unsigned int opcode: 4;
     unsigned int paramCount: 2;
-    unsigned short opcode;
 } command_def;
 
 typedef struct command{

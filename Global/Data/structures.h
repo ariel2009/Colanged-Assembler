@@ -1,3 +1,5 @@
+#define MAX_ERR_MSG_LEN 25
+
 /* Linked List node */
 typedef struct node {
 

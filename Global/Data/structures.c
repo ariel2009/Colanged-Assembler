@@ -10,7 +10,7 @@ void setNode(node* node, char* key, char* value)
     node->value = value;
     node->next = NULL;
     return;
-};
+}
 
 /* like constructor */
 void initializeHashMap(hashMap* mp)
@@ -31,7 +31,8 @@ int hashFunction(hashMap* mp, char* key)
 {
     int bucketIndex;
     int sum = 0, factor = 31;
-    for (int i = 0; i < strlen(key); i++) {
+    int i;
+    for (i = 0; i < strlen(key); i++) {
 
         /* sum = sum + (ascii value of char * (primeNumber ^ x))... where x = 1, 2, 3....n */
         sum = ((sum % mp->capacity)
@@ -115,7 +116,7 @@ void deleteRecord (hashMap* mp, char* key)
 
 char* search(hashMap* mp, char* key)
 {
-
+    char* errorMsg;
     /* Getting the bucket index for the given key */
     int bucketIndex = hashFunction(mp, key);
 
@@ -131,32 +132,7 @@ char* search(hashMap* mp, char* key)
     }
 
     /* If no key found in the hashMap equal to the given key */
-    char* errorMssg = (char*)malloc(sizeof(char) * 25);
-    errorMssg = "Oops! No data found.\n";
-    return errorMssg;
+    errorMsg = malloc(MAX_ERR_MSG_LEN);
+    errorMsg = "Oops! No data found.\n";
+    return errorMsg;
 }
-
-// /* Drivers code */
-// int main()
-// {
-
-//     /* Initialize the value of mp */
-//     hashMap* mp
-//         = (hashMap*)malloc(sizeof(hashMap));
-//     initializeHashMap(mp);
-
-//     insert(mp, "Yogaholic", "Anjali");
-
-//     printf("%s\n", search(mp, "Yogaholic"));
-
-//     /* Key is not inserted */
-//     printf("%s\n", search(mp, "randomKey"));
-
-//     printf("\nAfter deletion : \n");
-
-//     /* Deletion of key */
-//     deleteRecord (mp, "decentBoy");
-//     printf("%s\n", search(mp, "decentBoy"));
-
-//     return 0;
-// }

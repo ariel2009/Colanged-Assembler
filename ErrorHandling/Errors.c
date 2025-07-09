@@ -1,4 +1,6 @@
+#include <stdio.h>
 #include <stddef.h>
+
 #include "Errors.h"
 
 Error general_errors[] ={
@@ -25,23 +27,23 @@ Error mcro_errors[] ={
 
 void print_mcro_err(location *loc, unsigned short err_code){
     if(loc == NULL)
-        print_independed_err(err_code, mcro_errors);
+        print_independed_err(err_code, mcro_errors, sizeof(general_errors) / sizeof(Error)+1);
     else
-        print_depended_err(*loc, err_code, mcro_errors);
+        print_depended_err(*loc, err_code, mcro_errors, sizeof(general_errors) / sizeof(Error)+1);
 }
 
 void print_general_err(location *loc, unsigned short err_code){
     if(loc == NULL)
-        print_independed_err(err_code, general_errors);
+        print_independed_err(err_code, general_errors, 0);
     else
-        print_depended_err(*loc, err_code, general_errors);
+        print_depended_err(*loc, err_code, general_errors, 0);
 }
 
-void print_independed_err(unsigned short err_code, Error *type){
-    printf("~ERROR~: ID:%hu~~ | %s\n", err_code, type[err_code].err_msg);
+void print_independed_err(int err_code, Error *type, int offset){
+    printf("~ERROR~: ID:%d~~ | %s\n", err_code + offset, type[err_code].err_msg);
 }
 
-void print_depended_err(location loc, unsigned short err_code, Error *type){
-    printf("~ERROR~: ID:%hu~~ in %s at line:%d | there is error: %s\n", err_code, \
+void print_depended_err(location loc, int err_code, Error *type, int offset){
+    printf("~ERROR~: ID:%d~~ in %s at line:%lu | there is error: %s\n", err_code + offset, \
     loc.file_name, loc.line, type[err_code].err_msg);
 }

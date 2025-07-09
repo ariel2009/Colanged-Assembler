@@ -2,7 +2,7 @@
 #include "../Global/Data/structures.h"
 
 #define MCRO_DECL_TOK "mcro"
-#define MACRO_END_TOK "mroend"
+#define MACRO_END_TOK "mcroend"
 
 int expand_macro(char *fileName);
 int validate_mcro_decl(char *str, char *out_mcro_name);
