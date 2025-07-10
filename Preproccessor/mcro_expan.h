@@ -5,5 +5,5 @@
 #define MACRO_END_TOK "mcroend"
 
 int expand_macro(char *fileName);
-int validate_mcro_decl(char *str, char *out_mcro_name);
-void save_mcro(char *name, fpos_t *mcro_start, FILE *src, unsigned long lineCount, hashMap **macro_list);
+int validate_mcro_decl(char *str, char *mcro_name);
+void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount, hashMap **macro_list);

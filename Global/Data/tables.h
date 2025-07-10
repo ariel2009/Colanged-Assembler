@@ -1,3 +1,7 @@
+#define CMD_COUNT 16
+#define REG_COUNT 8
+#define INST_COUNT 5
+
 typedef struct command_def{
     char *name;
     unsigned int opcode: 4;

@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "tables.h"
 #include "structures.h"
@@ -31,29 +32,29 @@ char *registers[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 
 int isInstruct(char *possibleInst){
     int i;
-    for ( i = 0; i < sizeof(instructions); i++){
+    for ( i = 0; i < INST_COUNT; i++){
         if(strcmp(possibleInst, instructions[i]) == 0)
-            return ERROR;
+            return SUCCESS;
     }
-    return SUCCESS;
+    return ERROR;
 }
 
 int isCommand(char *possibleCmd){
     int i;
-    for ( i = 0; i < sizeof(commands); i++){
+    for ( i = 0; i < CMD_COUNT; i++){
         if(strcmp(possibleCmd, commands[i].name) == 0)
-            return ERROR;
+            return SUCCESS;
     }
-    return SUCCESS;
+    return ERROR;
 }
 
 int isRegister(char *possibleReg){
     int i;
-    for ( i = 0; i < sizeof(registers); i++){
+    for ( i = 0; i < REG_COUNT; i++){
         if(strcmp(possibleReg, registers[i]) == 0)
-            return ERROR;
+            return SUCCESS;
     }
-    return SUCCESS;
+    return ERROR;
 }
 
 struct hashMap *create_map(){

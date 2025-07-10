@@ -2,4 +2,4 @@
 #define POST 0
 
 char *removeExtraSpaces(char *str);
-int isExtraText(char *str, char *token, int preChck, char *afterTok);
+int isExtraText(char *str, char *token);
