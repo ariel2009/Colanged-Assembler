@@ -17,7 +17,7 @@ typedef struct hashMap {
     int numOfElements, capacity;
 
     /* hold base address array of linked list */
-    struct node** arr;
+    node** arr;
 } hashMap;
 
 void setNode(struct node* node, char* key, char* value);

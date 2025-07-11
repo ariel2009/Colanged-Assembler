@@ -40,6 +40,7 @@
 *.i*86
 *.x86_64
 *.hex
+assembler
 
 # Debug files
 *.dSYM/
@@ -57,3 +58,6 @@ Mkfile.old
 dkms.conf
 
 Tests/.DS_Store
+
+# Settings Files
+*.json

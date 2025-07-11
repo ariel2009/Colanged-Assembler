@@ -34,23 +34,21 @@ int expand_macro(char *fileName){
             continue;
         if(strstr(no_prepost_spaces_str, MACRO_END_TOK) != NULL){
             if(isInMcro){
-                printf("%s", no_prepost_spaces_str);
                 if(isExtraText(no_prepost_spaces_str, MACRO_END_TOK)){
                     err_loc = (location*)malloc(sizeof(location));
                     err_loc->file_name = fileName;
                     err_loc->line = lineCount;
                     print_mcro_err(err_loc, ERR_CODE_12);
                     free(err_loc);
-                    free(mcro_start);
                     free(mcro_name);
                     status = ERROR;
                 }
                 else{
-                    printf("naem: %s, lines: %d", mcro_name, mcroLinesCount);
                     save_mcro(mcro_name, mcro_start, fp, mcroLinesCount, &macros);
-                    free(mcro_name);
                 }
                 isInMcro = STATE_OUT;
+                free(mcro_start);
+                free(mcro_name);
             }
         }
         else if(strstr(no_prepost_spaces_str, MCRO_DECL_TOK) != NULL){
@@ -76,6 +74,7 @@ int expand_macro(char *fileName){
             mcroLinesCount++;
         }
     }
+    printf("%s", search(macros, "hi"));
     fclose(fp);
     return status;
 }
@@ -108,19 +107,19 @@ int validate_mcro_decl(char *str, char *mcro_name){
 
 void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount, hashMap **macro_list){
     char *next_c, *content;
-    int i;
+    int i, lines_passed = 0;
 
     content = malloc(lineCount*MAX_LINE_LENGTH);
     next_c = content;
 
     fsetpos(src, mcro_start);
-    /*Loop missing some characters, must handle it*/
-    for (i = 0; i < sizeof(content); i++)
+    for (i = 0; lines_passed<lineCount; i++)
     {
-        *(next_c + i) = getc(src);
-        printf("%c", *(next_c + i));
+        if((*(next_c + i) = getc(src)) == '\n'){
+            lines_passed++;
+        }
     }
-    /*Not working - memory issue
+
     insert(*macro_list, name, content);
-    */
+    free(content);
 }

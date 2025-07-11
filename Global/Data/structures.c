@@ -6,8 +6,11 @@
 /* like constructor */
 void setNode(node* node, char* key, char* value)
 {
-    node->key = key;
-    node->value = value;
+    node->key = malloc(sizeof(key));
+    node->value = malloc(sizeof(value));
+
+    strcpy(node->key, key);
+    strcpy(node->value, value);
     node->next = NULL;
     return;
 }
@@ -125,7 +128,7 @@ char* search(hashMap* mp, char* key)
     while (bucketHead != NULL) {
 
         /* Key is found in the hashMap */
-        if (bucketHead->key == key) {
+        if (strcmp(bucketHead->key, key) == 0) {
             return bucketHead->value;
         }
         bucketHead = bucketHead->next;
