@@ -10,7 +10,7 @@
 #include "../ErrorHandling/Errors.h"
 
 int expand_macro(char *fileName){
-    int status = SUCCESS, isInMcro = STATE_OUT;
+    int status = SUCCESS, isInMcro = STATE_OUT, err_code = 0;
     int mcroLinesCount = 0, lineCount = 0;
     char buff[MAX_LINE_LENGTH];
     char *mcro_name, *no_prepost_spaces_str;
@@ -29,18 +29,19 @@ int expand_macro(char *fileName){
     
     while(fgets(buff, MAX_LINE_LENGTH, fp) != NULL){
         lineCount++;
+        
         no_prepost_spaces_str = removeExtraSpaces(buff);
+    
         if(strcmp(no_prepost_spaces_str, "\n") == 0)
             continue;
         if(strstr(no_prepost_spaces_str, MACRO_END_TOK) != NULL){
             if(isInMcro){
-                if(isExtraText(no_prepost_spaces_str, MACRO_END_TOK)){
+                if(isExtraText(no_prepost_spaces_str)){
                     err_loc = (location*)malloc(sizeof(location));
                     err_loc->file_name = fileName;
                     err_loc->line = lineCount;
                     print_mcro_err(err_loc, ERR_CODE_12);
                     free(err_loc);
-                    free(mcro_name);
                     status = ERROR;
                 }
                 else{
@@ -48,27 +49,24 @@ int expand_macro(char *fileName){
                 }
                 isInMcro = STATE_OUT;
                 free(mcro_start);
-                free(mcro_name);
             }
         }
-        else if(strstr(no_prepost_spaces_str, MCRO_DECL_TOK) != NULL){
-                
-            mcro_name = malloc(MAX_LINE_LENGTH - sizeof(MCRO_DECL_TOK));
-            if(!validate_mcro_decl(no_prepost_spaces_str, mcro_name)){
-                printf("%s", mcro_name);
-                err_loc = (location*)malloc(sizeof(location));
-                err_loc->file_name = fileName;
-                err_loc->line = lineCount;
-                print_mcro_err(err_loc, ERR_CODE_11);
-                free(err_loc);
-                free(mcro_name);
-                status = ERROR;
-            }
-            else{
-                isInMcro = STATE_IN;
-                mcro_start = (fpos_t *)malloc(sizeof(fpos_t));
-                fgetpos(fp, mcro_start);
-            }
+        else if(strcmp(getToken(no_prepost_spaces_str, " \t"),\
+         MCRO_DECL_TOK) == 0){
+            mcro_name = strtok(NULL, "\n");
+                if((err_code = validate_mcro_name(mcro_name)) != 0){
+                        err_loc = (location*)malloc(sizeof(location));
+                        err_loc->file_name = fileName;
+                        err_loc->line = lineCount;
+                        print_mcro_err(err_loc, err_code);
+                        free(err_loc);
+                        status = ERROR;
+                }
+                else{
+                    isInMcro = STATE_IN;
+                    mcro_start = (fpos_t *)malloc(sizeof(fpos_t));
+                    fgetpos(fp, mcro_start);
+                }
         }
         else if(isInMcro){
             mcroLinesCount++;
@@ -79,37 +77,28 @@ int expand_macro(char *fileName){
     return status;
 }
 
-int validate_mcro_decl(char *str, char *mcro_name){
-    char *str_copy = malloc(sizeof(str));
+int validate_mcro_name(char *mcro_name){
 
-    strcpy(str_copy, str);
-    strtok(str_copy, " \t");
-    if(isExtraText(str_copy, MCRO_DECL_TOK)){
-        free(str_copy);
-        return ERROR;
-    }
-
-    strcpy(mcro_name, strtok(NULL, "\n"));
-    free(str_copy);
     if(mcro_name == NULL){
-        return ERROR;
+        return ERR_CODE_10;
     }
 
     if(isCommand(mcro_name) || isInstruct(mcro_name) || isRegister(mcro_name)){
-        return ERROR;
+        return ERR_CODE_11;
     }
 
-    if(strchr(mcro_name, '\t') != NULL || strchr(mcro_name, ' ') != NULL){
-        return ERROR;
+    if(isExtraText(mcro_name)){
+        return ERR_CODE_16;
     }
-    return SUCCESS;
+    return 0;
 }
 
+/*Error in this function*/
 void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount, hashMap **macro_list){
     char *next_c, *content;
     int i, lines_passed = 0;
 
-    content = malloc(lineCount*MAX_LINE_LENGTH);
+    content = malloc((lineCount+1)*MAX_LINE_LENGTH); /* Error: is always 8 bytes */
     next_c = content;
 
     fsetpos(src, mcro_start);

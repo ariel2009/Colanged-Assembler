@@ -38,6 +38,16 @@ char *removeExtraSpaces(char *str){
     return str_copy;
 }
 
-int isExtraText(char *str, char *token){
-    return strcmp(str, token) !=0;
+int isExtraText(char *str){
+    return strchr(str, '\t') || strchr(str, ' ');
+}
+
+char *getToken(char *str, char *delim){
+    char *str_copy = malloc(sizeof(str));
+    char *token;
+
+    strcpy(str_copy, str);
+    token = strtok(str_copy, delim);
+
+    return token;
 }
