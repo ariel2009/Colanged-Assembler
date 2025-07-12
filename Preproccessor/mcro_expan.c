@@ -16,7 +16,7 @@ int expand_macro(char *fileName){
     char *mcro_name, *no_prepost_spaces_str;
 
     FILE *fp;
-    fpos_t *mcro_start;
+    fpos_t *mcro_start, *pos_copy;
     location *err_loc;
     hashMap *macros;
 
@@ -29,12 +29,12 @@ int expand_macro(char *fileName){
     
     while(fgets(buff, MAX_LINE_LENGTH, fp) != NULL){
         lineCount++;
-        
+        printf("Line: %s, count: %d\n", buff, lineCount);
         no_prepost_spaces_str = removeExtraSpaces(buff);
     
         if(strcmp(no_prepost_spaces_str, "\n") == 0)
             continue;
-        if(strstr(no_prepost_spaces_str, MACRO_END_TOK) != NULL){
+        if(is_tok_in_str(no_prepost_spaces_str, MACRO_END_TOK)){
             if(isInMcro){
                 if(isExtraText(no_prepost_spaces_str)){
                     err_loc = (location*)malloc(sizeof(location));
@@ -45,9 +45,14 @@ int expand_macro(char *fileName){
                     status = ERROR;
                 }
                 else{
+                    pos_copy = (fpos_t *)malloc(sizeof(fpos_t));
+                    fgetpos(fp, pos_copy);
                     save_mcro(mcro_name, mcro_start, fp, mcroLinesCount, &macros);
+                    fsetpos(fp, pos_copy);
+                    free(pos_copy);
                 }
                 isInMcro = STATE_OUT;
+                mcroLinesCount = 0;
                 free(mcro_start);
             }
         }
@@ -72,6 +77,7 @@ int expand_macro(char *fileName){
             mcroLinesCount++;
         }
     }
+    free(macros);
     fclose(fp);
     return status;
 }
@@ -81,7 +87,7 @@ int validate_mcro_name(char *mcro_name){
     if(mcro_name == NULL){
         return ERR_CODE_10;
     }
-    
+
     mcro_name = removeExtraSpaces(mcro_name);
     if(isCommand(mcro_name) || isInstruct(mcro_name) || isRegister(mcro_name)){
         return ERR_CODE_11;
@@ -90,10 +96,10 @@ int validate_mcro_name(char *mcro_name){
     if(isExtraText(mcro_name)){
         return ERR_CODE_16;
     }
+
     return -1;
 }
 
-/*Error in this function*/
 void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount, hashMap **macro_list){
     char *content;
     int i, lines_passed = 0;
@@ -108,6 +114,6 @@ void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount, hashMap
         }
     }
     insert(*macro_list, name, content);
-    printf("%s", search(*macro_list, name));
+    printf("name: %s\ncontent:\n%s\n", name, search(*macro_list, name));
     free(content);
 }

@@ -22,7 +22,7 @@ Error mcro_errors[] ={
     {ERR_CODE_13, "Macro has more than one definition"},
     {ERR_CODE_14, "Failed to copy file during macros expansion"},
     {ERR_CODE_15, "Macros expansion in an .as file failed"},
-    {ERR_CODE_16, "Error - extra text after macro name definition"},
+    {ERR_CODE_16, "Error - extra text after macro name definition"}
 };
 
 void print_mcro_err(location *loc, unsigned short err_code){

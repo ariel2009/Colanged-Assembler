@@ -7,7 +7,6 @@
 #include "defines.h"
 
 
-/* Fix bugs in this function */
 char *removeExtraSpaces(char *str){
     char *str_copy;
     char ch;
@@ -32,6 +31,25 @@ char *removeExtraSpaces(char *str){
 
 int isExtraText(char *str){
     return strchr(str, '\t') || strchr(str, ' ');
+}
+
+int is_tok_in_str(char *str, char *tok){
+    char *str_copy = (char *)malloc(strlen(str) + 1);
+    char *token_iter;
+    
+    strcpy(str_copy, str);
+    token_iter = strtok(str_copy, " \t\n");
+
+    while(token_iter != NULL){
+        if(strcmp(token_iter, tok) == 0){
+            free(str_copy);
+            return SUCCESS;
+        }
+        token_iter = strtok(NULL, " \t\n");
+    }
+
+    free(str_copy);
+    return ERROR;
 }
 
 char *getToken(char *str, char *delim){
