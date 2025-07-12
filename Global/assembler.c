@@ -14,7 +14,7 @@ int main(int argc, char const *argv[])
     }
     for (i = 1; i < argc && status == SUCCESS; i++)
     {
-        char *fileName = malloc(MAX_LINE_LENGTH);
+        char *fileName = (char *)malloc(MAX_LINE_LENGTH);
         strcpy(fileName, argv[i]);
         status = expand_macro(fileName);
         free(fileName);

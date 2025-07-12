@@ -10,27 +10,19 @@
 /* Fix bugs in this function */
 char *removeExtraSpaces(char *str){
     char *str_copy;
-    int isInText = STATE_OUT;
     char ch;
     int i =0, text_start = 0, text_end = 0;
 
-    str_copy = malloc(sizeof(str));
+    str_copy = (char *)malloc(strlen(str) + 1);
     strcpy(str_copy, str);
     /* Loop while non-space text ended and put \0 there to sign end of string*/
     while(*(str_copy + i) == ' ' || *(str_copy + i) == '\t') i++;
     text_start = i;
 
-    isInText = STATE_IN;
     for( ;i < MAX_LINE_LENGTH && (ch = *(str_copy + i)) != '\0'; i++){
         if(!isspace(ch)){
-            if(isInText)
-                text_end++;
-            else
-                text_end = i;
-            isInText = STATE_OUT;
+            text_end = i;
         }
-        else
-            isInText = STATE_IN;
     }
 
     *(str_copy + text_end + 1) = '\0';
@@ -43,7 +35,7 @@ int isExtraText(char *str){
 }
 
 char *getToken(char *str, char *delim){
-    char *str_copy = malloc(sizeof(str));
+    char *str_copy = (char *)malloc(strlen(str) + 1);
     char *token;
 
     strcpy(str_copy, str);

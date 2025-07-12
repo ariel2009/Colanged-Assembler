@@ -6,8 +6,8 @@
 /* like constructor */
 void setNode(node* node, char* key, char* value)
 {
-    node->key = malloc(sizeof(key));
-    node->value = malloc(sizeof(value));
+    node->key = (char *)malloc(strlen(key) +1);
+    node->value = (char *)malloc(strlen(value) +1);
 
     strcpy(node->key, key);
     strcpy(node->value, value);
