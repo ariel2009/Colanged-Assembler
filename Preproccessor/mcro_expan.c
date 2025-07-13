@@ -29,7 +29,7 @@ int expand_macro(char *fileName){
     
     while(fgets(buff, MAX_LINE_LENGTH, fp) != NULL){
         lineCount++;
-        printf("Line: %s, count: %d\n", buff, lineCount);
+        /*printf("Line: %s, count: %d\n", buff, lineCount);*/
         no_prepost_spaces_str = removeExtraSpaces(buff);
     
         if(strcmp(no_prepost_spaces_str, "\n") == 0)
@@ -77,6 +77,12 @@ int expand_macro(char *fileName){
             mcroLinesCount++;
         }
     }
+
+    if(status != ERROR){
+        /*
+            Need to copy the file to expanded one
+        */
+    }
     free(macros);
     fclose(fp);
     return status;
@@ -114,6 +120,35 @@ void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount, hashMap
         }
     }
     insert(*macro_list, name, content);
-    printf("name: %s\ncontent:\n%s\n", name, search(*macro_list, name));
     free(content);
+}
+
+char *skip_until_mcroend(char *line){
+    char *token = getToken(line, " \t");
+    char *mcroend_str;
+    if(token == NULL){
+        return NULL;
+    }
+    if(strcmp(token, MCRO_DECL_TOK) == 0){
+        mcroend_str = (char *)malloc(strlen(MCRO_DECL_TOK) + 1);
+        strcpy(mcroend_str, MCRO_DECL_TOK);
+        free(token);
+        return mcroend_str;
+    }
+}
+
+char *exchange_if_mcro_name(char *line, hashMap *macro_list){
+    char *token = getToken(line, "\n");
+    char *content;
+    char *content_copy;
+    if(token == NULL)
+        return NULL;
+    if((content = search(macro_list, token)) != NULL){
+        content_copy = malloc(strlen(content) + 1);
+        strcpy(content_copy, content);
+        free(token);
+        return content_copy;
+    }
+    free(token);
+    return NULL;
 }

@@ -3,6 +3,7 @@
 
 #define MCRO_DECL_TOK "mcro"
 #define MACRO_END_TOK "mcroend"
+#define MAX_MCRO_LINES 200
 
 int expand_macro(char *fileName);
 int validate_mcro_name(char *mcro_name);

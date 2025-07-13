@@ -61,3 +61,25 @@ char *getToken(char *str, char *delim){
 
     return token;
 }
+
+int get_line_count(char *content){
+
+    int i = 0, line_count = 1;
+    char current_ch;
+    char *content_copy  = (char *)malloc(strlen(content) + 1);
+
+    if(content == NULL || strlen(content) <= 1){
+        return ERROR;
+    }
+
+    strcpy(content_copy, content);
+
+    while ((current_ch = *(content_copy + i)) != '\0'){
+        if(current_ch == '\n'){
+            line_count++;
+        }
+    }
+
+    free(content_copy);
+    return line_count;
+}

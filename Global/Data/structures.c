@@ -119,7 +119,6 @@ void deleteRecord (hashMap* mp, char* key)
 
 char* search(hashMap* mp, char* key)
 {
-    char* errorMsg;
     /* Getting the bucket index for the given key */
     int bucketIndex = hashFunction(mp, key);
 
@@ -133,9 +132,5 @@ char* search(hashMap* mp, char* key)
         }
         bucketHead = bucketHead->next;
     }
-
-    /* If no key found in the hashMap equal to the given key */
-    errorMsg = malloc(MAX_ERR_MSG_LEN);
-    errorMsg = "Oops! No data found.\n";
-    return errorMsg;
+    return NULL;
 }
