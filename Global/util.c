@@ -24,7 +24,7 @@ char *removeExtraSpaces(char *str){
         }
     }
 
-    *(str_copy + text_end + 1) = '\0';
+    if(text_end > 0) *(str_copy + text_end + 1) = '\n';
     str_copy += text_start;
     return str_copy;
 }
@@ -81,5 +81,5 @@ int get_line_count(char *content){
     }
 
     free(content_copy);
-    return line_count;
+    return line_count-1;
 }
