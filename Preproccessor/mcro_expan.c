@@ -152,3 +152,21 @@ char *exchange_if_mcro_name(char *line, hashMap *macro_list){
     free(token);
     return NULL;
 }
+
+int expan_and_remove_defs(hashMap *mcro_list, FILE *src, char *src_file_name){
+    char *new_file_name = malloc(strlen(src_file_name) + 1);
+    char *last_dot_pos;
+
+    strcpy(new_file_name, src_file_name);
+    last_dot_pos = strrchr(new_file_name, '.');
+    last_dot_pos = '.am'; // So we will get the same file name as source but .am extension
+    
+    FILE *dest = fopen(new_file_name, "w");
+    if(dest == NULL){
+        print_general_err(NULL, ERR_CODE_7);
+        return ERROR;
+    }
+
+    copy_file(src, dest, skip_until_mcroend, exchange_if_mcro_name);
+    return SUCCESS;
+}
