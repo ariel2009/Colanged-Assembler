@@ -35,7 +35,7 @@ FILE *tryOpenFile(char *fileNameToOpen, char *exten, char *mode){
 
 void copy_file(FILE *src, FILE *dest, char* (*skip_until)(char *), char* (*exchange)(char *)){
     char buff[MAX_LINE_LENGTH];
-    char *dest_buff = (char *)malloc(MAX_LINE_LENGTH);
+    char *dest_buff;
     char *exchanged_str;
     char *end_skip_str;
     int skip_state = STATE_OUT, in_regular_content = STATE_OUT;
@@ -43,43 +43,43 @@ void copy_file(FILE *src, FILE *dest, char* (*skip_until)(char *), char* (*excha
 
     /*int lines_wait_count = 0;*/
 
-    while(fgets(buff, MAX_LINE_LENGTH, src)){
-
-        strcpy(dest_buff, buff);
-        
-        if(*dest_buff != '\n'){ /*skip blank lines*/
-            if(skip_state == STATE_OUT){
-                if(is_skip && (end_skip_str = skip_until(dest_buff)) != NULL){
-                    skip_state = STATE_IN;
-                }
-                else {
+    while(fgets(buff, MAX_LINE_LENGTH, src)){        
+        if(skip_state == STATE_OUT){
+            if(is_skip && (end_skip_str = skip_until(dest_buff)) != NULL){
+                skip_state = STATE_IN;
+            }
+            else {
+                if(is_exchanged &&(exchanged_str = exchange(buff)) != NULL){
                     if(in_regular_content == STATE_IN){
                         putc('\n', dest);
                     }
-
-                    if(is_exchanged &&(exchanged_str = exchange(dest_buff)) != NULL){
-                        fprintf(dest, exchanged_str, "%s");
-                    }
-                    else{
-
-                        fprintf(dest, dest_buff, "%s");
-                    }
-
-                    in_regular_content = STATE_IN;
+                    fprintf(dest, exchanged_str, "%s");
                 }
-            }
-            else if(strcmp(dest_buff, end_skip_str) == 0){
-                in_regular_content = STATE_OUT;
-                skip_state = STATE_OUT;
+                else{
+                    dest_buff = removeExtraSpaces(buff);
+                    if(dest_buff != NULL){
+                        fprintf(dest, dest_buff, "%s");
+                        if(in_regular_content == STATE_IN){
+                            putc('\n', dest);
+                        }
+                    }
+                }
+                in_regular_content = STATE_IN;
             }
         }
+        else if(end_skip_str != NULL && strcmp(buff, end_skip_str) == 0){
+            in_regular_content = STATE_OUT;
+            skip_state = STATE_OUT;
+        }
     }
-    fclose(src);
-    fclose(dest);
+    /*fclose(src);
+    fclose(dest);*/
 }
 
 int prepare_no_extra_spaces_file(char *filename, char *ext){
     FILE *src, *tmp;
+    char* (*no_skip) (char *);
+    no_skip = NULL;
     src = tryOpenFile(filename, ext, "r");
     tmp = fopen(TMP_FILE_NAME, "w");
 
@@ -92,9 +92,9 @@ int prepare_no_extra_spaces_file(char *filename, char *ext){
         return ERROR;
     }
 
-    copy_file(src, tmp, removeExtraSpaces, NULL);
-    fclose(src);
-    fclose(tmp);
+    copy_file(src, tmp, NULL, removeExtraSpaces);
+    /*fclose(src);
+    fclose(tmp);*/
 
     return SUCCESS;
 }

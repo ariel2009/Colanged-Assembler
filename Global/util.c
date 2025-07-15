@@ -15,7 +15,7 @@ char *removeExtraSpaces(char *str){
     str_copy = (char *)malloc(strlen(str) + 1);
     strcpy(str_copy, str);
     /* Loop while non-space text ended and put \0 there to sign end of string*/
-    while(*(str_copy + i) == ' ' || *(str_copy + i) == '\t') i++;
+    while(isspace(*(str_copy + i))) i++;
     text_start = i;
 
     for( ;i < MAX_LINE_LENGTH && (ch = *(str_copy + i)) != '\0'; i++){
@@ -24,7 +24,9 @@ char *removeExtraSpaces(char *str){
         }
     }
 
-    if(text_end > 0) *(str_copy + text_end + 1) = '\n';
+    if(text_end == 0) return NULL;
+
+    *(str_copy + text_end + 1) = '\0';
     str_copy += text_start;
     return str_copy;
 }
@@ -82,4 +84,8 @@ int get_line_count(char *content){
 
     free(content_copy);
     return line_count-1;
+}
+
+char* returnNull(char *whatever){
+    return NULL;
 }
