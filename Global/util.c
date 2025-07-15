@@ -54,16 +54,6 @@ int is_tok_in_str(char *str, char *tok){
     return ERROR;
 }
 
-char *getToken(char *str, char *delim){
-    char *str_copy = (char *)malloc(strlen(str) + 1);
-    char *token;
-
-    strcpy(str_copy, str);
-    token = strtok(str_copy, delim);
-
-    return token;
-}
-
 int get_line_count(char *content){
 
     int i = 0, line_count = 1;

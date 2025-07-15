@@ -7,7 +7,7 @@
 #include "../Global/defines.h"
 #include "../Global/util.h"
 
-int isFileNameValid(char *fullName, char *allowed_ext){
+int is_extension_valid(char *fullName, char *allowed_ext){
 
     char *last_dot_pos = strrchr(fullName, '.');
 
@@ -20,36 +20,33 @@ int isFileNameValid(char *fullName, char *allowed_ext){
     return SUCCESS;
 }
 
-FILE *tryOpenFile(char *fileNameToOpen, char *exten, char *mode){
-    FILE *fp;
-    fp = fopen(fileNameToOpen, mode);
-    if(!isFileNameValid(fileNameToOpen, exten)){
-        return NULL;
-    }
-    if(fp == NULL){
-        print_general_err(NULL, ERR_CODE_4);
-        return NULL;
-    }
-    return fp;
-}
-
-void copy_file(FILE *src, FILE *dest, char* (*skip_until)(char *), char* (*exchange)(char *)){
+int copy_file(char *src_file_name, char *dest_file_name, char* (*skip_until)(char *), char* (*exchange)(char *)){
+    FILE *src, *dest;
     char buff[MAX_LINE_LENGTH];
     char *dest_buff;
-    char *exchanged_str;
-    char *end_skip_str;
+    char *exchanged_str, *end_skip_str, *token;
     int skip_state = STATE_OUT, in_regular_content = STATE_OUT;
     int is_skip = skip_until != NULL, is_exchanged = exchange != NULL;
 
-    /*int lines_wait_count = 0;*/
+    src = fopen(src_file_name, "r");
+    dest = fopen(dest_file_name, "w");
+
+    if(src == NULL){
+        print_general_err(NULL, ERR_CODE_8);
+        return ERROR;
+    }
+    if(dest == NULL){
+        print_general_err(NULL, ERR_CODE_7);
+        return ERROR;
+    }
 
     while(fgets(buff, MAX_LINE_LENGTH, src)){        
         if(skip_state == STATE_OUT){
-            if(is_skip && (end_skip_str = skip_until(dest_buff)) != NULL){
+            if(is_skip && (end_skip_str = skip_until(buff)) != NULL){
                 skip_state = STATE_IN;
             }
             else {
-                if(is_exchanged &&(exchanged_str = exchange(buff)) != NULL){
+                if(is_exchanged && (exchanged_str = exchange(buff)) != NULL){
                     if(in_regular_content == STATE_IN){
                         putc('\n', dest);
                     }
@@ -58,43 +55,34 @@ void copy_file(FILE *src, FILE *dest, char* (*skip_until)(char *), char* (*excha
                 else{
                     dest_buff = removeExtraSpaces(buff);
                     if(dest_buff != NULL){
-                        fprintf(dest, dest_buff, "%s");
                         if(in_regular_content == STATE_IN){
                             putc('\n', dest);
                         }
+                        fprintf(dest, dest_buff, "%s");
                     }
                 }
                 in_regular_content = STATE_IN;
             }
         }
-        else if(end_skip_str != NULL && strcmp(buff, end_skip_str) == 0){
-            in_regular_content = STATE_OUT;
-            skip_state = STATE_OUT;
+        else if(end_skip_str != NULL){
+                token = strtok(buff, "\n");
+                if(strcmp(token, end_skip_str) == 0){
+                    in_regular_content = STATE_OUT;
+                    skip_state = STATE_OUT;
+                }
         }
     }
-    /*fclose(src);
-    fclose(dest);*/
+    fclose(src);
+    fclose(dest);
+    return SUCCESS;
 }
 
 int prepare_no_extra_spaces_file(char *filename, char *ext){
-    FILE *src, *tmp;
-    char* (*no_skip) (char *);
-    no_skip = NULL;
-    src = tryOpenFile(filename, ext, "r");
-    tmp = fopen(TMP_FILE_NAME, "w");
 
-    if(src == NULL){
-        print_general_err(NULL, ERR_CODE_8);
-        return ERROR;
-    }
-    if(tmp == NULL){
-        print_general_err(NULL, ERR_CODE_7);
-        return ERROR;
+    if(is_extension_valid(filename, ext) &&\
+        copy_file(filename, TMP_FILE_NAME, NULL, removeExtraSpaces)){
+            return SUCCESS;
     }
 
-    copy_file(src, tmp, NULL, removeExtraSpaces);
-    /*fclose(src);
-    fclose(tmp);*/
-
-    return SUCCESS;
+    return ERROR;
 }

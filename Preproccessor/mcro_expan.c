@@ -21,42 +21,20 @@ int expand_macro(char *fileName){
     fpos_t *mcro_start, *pos_copy;
     location *err_loc;
 
+    fp = fopen(fileName, "r");
+    if(fp == NULL){
+        print_general_err(NULL, ERR_CODE_8);
+        return ERROR;
+    }
+    
     macro_list = (hashMap *)malloc(sizeof(hashMap));
     initializeHashMap(macro_list);
-
-    fp = fopen(fileName, "r");
     
     while(fgets(buff, MAX_LINE_LENGTH, fp) != NULL){
         lineCount++;
         buff_copy = (char *)malloc(strlen(buff) + 1);
         strcpy(buff_copy, buff);
-        /*printf("Line: %s, count: %d\n", buff, lineCount);*/
-        /*no_prepost_spaces_str = removeExtraSpaces(buff);*/
     
-        /*if(strcmp(no_prepost_spaces_str, "\n") == 0)
-            continue;*/
-        /*if(is_tok_in_str(no_prepost_spaces_str, MACRO_END_TOK)){
-            if(isInMcro){
-                if(isExtraText(no_prepost_spaces_str)){
-                    err_loc = (location*)malloc(sizeof(location));
-                    err_loc->file_name = fileName;
-                    err_loc->line = lineCount;
-                    print_mcro_err(err_loc, ERR_CODE_12);
-                    free(err_loc);
-                    status = ERROR;
-                }
-                else{
-                    pos_copy = (fpos_t *)malloc(sizeof(fpos_t));
-                    fgetpos(fp, pos_copy);
-                    save_mcro(mcro_name, mcro_start, fp, mcroLinesCount);
-                    fsetpos(fp, pos_copy);
-                    free(pos_copy);
-                }
-                isInMcro = STATE_OUT;
-                mcroLinesCount = 0;
-                free(mcro_start);
-            }
-        }*/
         token = strtok(buff_copy, "\n");
         if(strcmp(token, MACRO_END_TOK) == 0){
             if(isInMcro){
@@ -80,51 +58,36 @@ int expand_macro(char *fileName){
                 free(mcro_start);
             }
         }
-        /*else if(strcmp(getToken(no_prepost_spaces_str, " \t"),\
-         MCRO_DECL_TOK) == 0){
-            mcro_name = strtok(NULL, "\n");
-            if((err_code = validate_mcro_name(mcro_name)) != -1){
-                    err_loc = (location*)malloc(sizeof(location));
-                    err_loc->file_name = fileName;
-                    err_loc->line = lineCount;
-                    print_mcro_err(err_loc, err_code);
-                    free(err_loc);
-                    status = ERROR;
+        else{
+            strcpy(buff_copy, buff);
+            token = strtok(buff_copy, " \t");
+
+            if(strcmp(token, MCRO_DECL_TOK) == 0){
+                mcro_name = strtok(NULL, "\n");
+                if((err_code = validate_mcro_name(mcro_name)) != -1){
+                        err_loc = (location*)malloc(sizeof(location));
+                        err_loc->file_name = fileName;
+                        err_loc->line = lineCount;
+                        print_mcro_err(err_loc, err_code);
+                        free(err_loc);
+                        status = ERROR;
+                }
+                else{
+                    isInMcro = STATE_IN;
+                    mcro_start = (fpos_t *)malloc(sizeof(fpos_t));
+                    fgetpos(fp, mcro_start);
+                }
             }
-            else{
-                isInMcro = STATE_IN;
-                mcro_start = (fpos_t *)malloc(sizeof(fpos_t));
-                fgetpos(fp, mcro_start);
+            else if(isInMcro){
+                mcroLinesCount++;
             }
-        }*/
-        else if(strcmp(token, MCRO_DECL_TOK) == 0){
-            mcro_name = strtok(NULL, "\n");
-            if((err_code = validate_mcro_name(mcro_name)) != -1){
-                    err_loc = (location*)malloc(sizeof(location));
-                    err_loc->file_name = fileName;
-                    err_loc->line = lineCount;
-                    print_mcro_err(err_loc, err_code);
-                    free(err_loc);
-                    status = ERROR;
-            }
-            else{
-                isInMcro = STATE_IN;
-                mcro_start = (fpos_t *)malloc(sizeof(fpos_t));
-                fgetpos(fp, mcro_start);
-            }
-        }
-        else if(isInMcro){
-            mcroLinesCount++;
         }
     }
     
     if(status != ERROR){
-        /*
-            Need to copy the file to expanded one
-        */
-        fclose(fp);
         status = expan_and_remove_defs(fileName);
     }
+    fclose(fp);
     free(macro_list);
     return status;
 }
@@ -162,66 +125,66 @@ void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount){
             lines_passed++;
         }
     }
-    *(content+i) = '\0'; /*To avoid post-new_line*/
+    *(content+i-1) = '\0'; /*To avoid post-new_line*/
     printf("%s", content);
     insert(macro_list, name, content);
     free(content);
 }
 
 char *skip_until_mcroend(char *line){
-    char *token = getToken(line, " \t");
-    char *mcroend_str;
+    char *line_copy = malloc(strlen(line) + 1);
+    char *token;
+
+    strcpy(line_copy, line);
+    token = strtok(line_copy, " \t");
+
     if(token == NULL){
+        free(line_copy);
         return NULL;
     }
+
     if(strcmp(token, MCRO_DECL_TOK) == 0){
-        mcroend_str = (char *)malloc(strlen(MCRO_DECL_TOK) + 1);
-        strcpy(mcroend_str, MACRO_END_TOK);
-        /*free(token);*/
-        return mcroend_str;
+        free(line_copy);
+        return MACRO_END_TOK;
     }
+
+    free(line_copy);
     return NULL;
 }
 
 char *exchange_if_mcro_name(char *line){
-    char *token = getToken(line, "\n");
+    char *line_copy = malloc(strlen(line) + 1);
+    char *token;
     char *content;
     char *content_copy;
-    if(token == NULL)
+
+    strcpy(line_copy, line);
+    token = strtok(line_copy, "\n");
+
+    if(token == NULL){
+        free(line_copy);
         return NULL;
+    }
+
     if((content = search(macro_list, token)) != NULL){
         content_copy = malloc(strlen(content) + 1);
         strcpy(content_copy, content);
-        /*free(token);*/
+        free(line_copy);
         return content_copy;
     }
-    /*free(token);*/
+    
+    free(line_copy);
     return NULL;
 }
 
 int expan_and_remove_defs(char *src_file_name){
-    FILE *src, *dest;
     char *new_file_name = malloc(strlen(src_file_name) + 1);
-    char *last_dot_pos;
 
     strcpy(new_file_name, src_file_name);
-    /*Need to add support on filenames without extensions*/
-    if((last_dot_pos = strrchr(new_file_name, '.')) != NULL)
-    {
-        last_dot_pos = ".am"; /* So we will get the same file name as source but .am extension */
-    }
 
-    src = fopen(src_file_name, "r");
-    dest = fopen("example.am", "w");
-    if(src == NULL){
-        print_general_err(NULL, ERR_CODE_8);
+    if(!copy_file(src_file_name, "example.am", skip_until_mcroend, exchange_if_mcro_name)){
         return ERROR;
     }
-    if(dest == NULL){
-        print_general_err(NULL, ERR_CODE_7);
-    }
-
-    copy_file(src, dest, skip_until_mcroend, exchange_if_mcro_name);
 
     return SUCCESS;
 }
