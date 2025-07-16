@@ -11,18 +11,19 @@
 
 hashMap *macro_list;
 
-int expand_macro(char *fileName){
+int expand_macro(char *src_file_name, char *input_file_name){
     int status = SUCCESS, isInMcro = STATE_OUT, err_code = 0;
     int mcroLinesCount = 0, lineCount = 0;
     char buff[MAX_LINE_LENGTH], *buff_copy;
-    char *mcro_name, *no_prepost_spaces_str, *token;
+    char *mcro_name, *token;
 
-    FILE *fp;
+    FILE *input, *src;
     fpos_t *mcro_start, *pos_copy;
     location *err_loc;
 
-    fp = fopen(fileName, "r");
-    if(fp == NULL){
+    input = fopen(input_file_name, "r");
+    src = fopen(src_file_name, "r");
+    if(input == NULL || src == NULL){
         print_general_err(NULL, ERR_CODE_8);
         return ERROR;
     }
@@ -30,7 +31,8 @@ int expand_macro(char *fileName){
     macro_list = (hashMap *)malloc(sizeof(hashMap));
     initializeHashMap(macro_list);
     
-    while(fgets(buff, MAX_LINE_LENGTH, fp) != NULL){
+    while(fgets(buff, MAX_LINE_LENGTH, input) != NULL){
+        /*lineCount += count_spaces_lines(src) + 1; */
         lineCount++;
         buff_copy = (char *)malloc(strlen(buff) + 1);
         strcpy(buff_copy, buff);
@@ -40,7 +42,8 @@ int expand_macro(char *fileName){
             if(isInMcro){
                 if(isExtraText(buff_copy)){
                     err_loc = (location*)malloc(sizeof(location));
-                    err_loc->file_name = fileName;
+                    /*err_loc->file_name = src_file_name;*/
+                    err_loc->file_name = input_file_name;
                     err_loc->line = lineCount;
                     print_mcro_err(err_loc, ERR_CODE_12);
                     free(err_loc);
@@ -48,9 +51,9 @@ int expand_macro(char *fileName){
                 }
                 else{
                     pos_copy = (fpos_t *)malloc(sizeof(fpos_t));
-                    fgetpos(fp, pos_copy);
-                    save_mcro(mcro_name, mcro_start, fp, mcroLinesCount);
-                    fsetpos(fp, pos_copy);
+                    fgetpos(input, pos_copy);
+                    save_mcro(mcro_name, mcro_start, input, mcroLinesCount);
+                    fsetpos(input, pos_copy);
                     free(pos_copy);
                 }
                 isInMcro = STATE_OUT;
@@ -60,13 +63,15 @@ int expand_macro(char *fileName){
         }
         else{
             strcpy(buff_copy, buff);
-            token = strtok(buff_copy, " \t");
+            token = strtok(buff_copy, " \t\n");
 
             if(strcmp(token, MCRO_DECL_TOK) == 0){
                 mcro_name = strtok(NULL, "\n");
+                mcro_name = removeExtraSpaces(mcro_name);
                 if((err_code = validate_mcro_name(mcro_name)) != -1){
                         err_loc = (location*)malloc(sizeof(location));
-                        err_loc->file_name = fileName;
+                        /*err_loc->file_name = src_file_name;*/
+                        err_loc->file_name = input_file_name;
                         err_loc->line = lineCount;
                         print_mcro_err(err_loc, err_code);
                         free(err_loc);
@@ -75,7 +80,7 @@ int expand_macro(char *fileName){
                 else{
                     isInMcro = STATE_IN;
                     mcro_start = (fpos_t *)malloc(sizeof(fpos_t));
-                    fgetpos(fp, mcro_start);
+                    fgetpos(input, mcro_start);
                 }
             }
             else if(isInMcro){
@@ -85,9 +90,10 @@ int expand_macro(char *fileName){
     }
     
     if(status != ERROR){
-        status = expan_and_remove_defs(fileName);
+        status = expan_and_remove_defs(input_file_name);
     }
-    fclose(fp);
+    fclose(input);
+    fclose(src);
     free(macro_list);
     return status;
 }
@@ -98,13 +104,16 @@ int validate_mcro_name(char *mcro_name){
         return ERR_CODE_10;
     }
 
-    mcro_name = removeExtraSpaces(mcro_name);
     strtok(mcro_name, "\n"); /*To remove new line char*/
 
     if(isCommand(mcro_name) || isInstruct(mcro_name) || isRegister(mcro_name)){
         return ERR_CODE_11;
     }
 
+    if(search(macro_list, mcro_name) != NULL){
+        return ERR_CODE_13;
+    }
+    
     if(isExtraText(mcro_name)){
         return ERR_CODE_16;
     }
@@ -115,7 +124,7 @@ int validate_mcro_name(char *mcro_name){
 void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount){
     char *content;
     int i, lines_passed = 0;
-
+    printf("%s", name);
     content = (char *)malloc(lineCount*MAX_LINE_LENGTH);
 
     fsetpos(src, mcro_start);

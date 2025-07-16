@@ -20,7 +20,7 @@ int main(int argc, char const *argv[])
         strcpy(fileName, argv[i]);
         
         if(prepare_no_extra_spaces_file(fileName, SRC_FILE_EXT)){
-            status = expand_macro(no_extra_spaces_f_name);
+            status = expand_macro(fileName, no_extra_spaces_f_name);
         }
         free(fileName);
     }
