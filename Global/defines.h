@@ -1,4 +1,4 @@
-#define SRC_FILE_EXT ".as"
+#define SRC_FILE_EXT "as"
 #define MAX_LINE_LENGTH 81
 #define SUCCESS 1
 #define ERROR 0

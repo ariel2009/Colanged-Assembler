@@ -79,10 +79,58 @@ int copy_file(char *src_file_name, char *dest_file_name, char* (*skip_until)(cha
 
 int prepare_no_extra_spaces_file(char *filename, char *ext){
 
-    if(is_extension_valid(filename, ext) &&\
+    /*if(is_extension_valid(filename, ext) &&\
         copy_file(filename, TMP_FILE_NAME, NULL, removeExtraSpaces)){
             return SUCCESS;
+    }*/
+    if(!copy_file(filename, TMP_FILE_NAME, NULL, removeExtraSpaces))
+        return ERROR; 
+    return SUCCESS;
+}
+
+int try_add_file(char *filename, char *exten){
+    FILE *fp;
+    char *name_copy;
+    char *token;
+
+    name_copy = malloc(strlen(filename) +1);
+    strcpy(name_copy, filename);
+
+    if(strchr(name_copy, '.') != NULL){
+        strtok(name_copy, ".");;
+        token = strtok(NULL, " \n");
+        if(token == NULL || strcmp(token, exten) != 0){
+            free(name_copy);
+            print_general_err(NULL, ERR_CODE_2);
+            return ERROR;
+        }
+    }
+    else{
+        strcat(filename, ".");
+        strcat(filename, exten);
     }
 
-    return ERROR;
+    fp = fopen(filename, "r");
+    if(fp == NULL){
+        print_general_err(NULL, ERR_CODE_4);
+        return ERROR;
+    }
+
+    free(name_copy);
+    fclose(fp);
+    return SUCCESS;
 }
+/*int count_spaces_lines(FILE *file_with_spaces){
+    char *buff_of_src;
+    int space_line = STATE_IN, spaces_count = 0;
+    buff_of_src = malloc(MAX_LINE_LENGTH);
+
+    while(fgets(buff_of_src, MAX_LINE_LENGTH, file_with_spaces) && space_line){
+        if(removeExtraSpaces(buff_of_src) != NULL){
+            space_line = STATE_OUT;
+        }
+        spaces_count++;
+    }
+    return spaces_count;
+    free(buff_of_src);
+}*/

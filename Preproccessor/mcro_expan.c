@@ -11,6 +11,7 @@
 
 hashMap *macro_list;
 
+/* Have an issue about incorrect file name when error! */
 int expand_macro(char *src_file_name, char *input_file_name){
     int status = SUCCESS, isInMcro = STATE_OUT, err_code = 0;
     int mcroLinesCount = 0, lineCount = 0;
