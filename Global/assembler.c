@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "defines.h"
+#include "../first_pass/main_pass.h"
 #include "../IO/FileHandler.h"
 #include "../Preproccessor/mcro_expan.h"
 
@@ -20,6 +21,10 @@ int main(int argc, char const *argv[])
         strcpy(fileName, argv[i]);
         if(try_add_file(fileName, SRC_FILE_EXT) && prepare_no_extra_spaces_file(fileName, SRC_FILE_EXT)){
             status = expand_macro(fileName, no_extra_spaces_f_name);
+            if(status){
+                /* Test */
+                status = scan_am_file("example.am");
+            }
         }
         free(fileName);
     }

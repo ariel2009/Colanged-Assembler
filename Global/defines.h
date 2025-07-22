@@ -4,5 +4,3 @@
 #define ERROR 0
 #define STATE_IN 1
 #define STATE_OUT 0
-#define EXTERN 1
-#define INTERN 0

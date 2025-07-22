@@ -125,7 +125,6 @@ int validate_mcro_name(char *mcro_name){
 void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount){
     char *content;
     int i, lines_passed = 0;
-    printf("%s", name);
     content = (char *)malloc(lineCount*MAX_LINE_LENGTH);
 
     fsetpos(src, mcro_start);
@@ -136,7 +135,6 @@ void save_mcro(char *name, fpos_t *mcro_start, FILE *src, int lineCount){
         }
     }
     *(content+i-1) = '\0'; /*To avoid post-new_line*/
-    printf("%s", content);
     insert(macro_list, name, content);
     free(content);
 }
@@ -188,10 +186,14 @@ char *exchange_if_mcro_name(char *line){
 }
 
 int expan_and_remove_defs(char *src_file_name){
-    char *new_file_name = malloc(strlen(src_file_name) + 1);
+    char *new_file_name;
 
+    new_file_name = malloc(strlen(src_file_name) + 1);
     strcpy(new_file_name, src_file_name);
 
+    strtok(new_file_name, ".");
+    strcat(new_file_name, ".am");
+    
     if(!copy_file(src_file_name, "example.am", skip_until_mcroend, exchange_if_mcro_name)){
         return ERROR;
     }

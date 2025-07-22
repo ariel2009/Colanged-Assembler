@@ -30,6 +30,8 @@ char *instructions[] =
 
 char *registers[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 
+instruction entries[], externs[];
+
 int isInstruct(char *possibleInst){
     int i;
     for ( i = 0; i < INST_COUNT; i++){
@@ -57,8 +59,30 @@ int isRegister(char *possibleReg){
     return ERROR;
 }
 
-struct hashMap *create_map(){
+/*struct hashMap *create_map(){
     struct hashMap *macros;
     macros = (struct hashMap*)malloc(sizeof(struct hashMap));
     return macros;
+}*/
+
+/* Go ahead from here */
+int add_to_table(instruction *inst_data, int type){
+    switch (type)
+    {
+    case  EXTERN_OR_ENTRY:
+        if (inst_data->is_extern)
+        {
+            /* Add to externs table */
+            return SUCCESS;
+        }
+        /* Add to entries table */
+        return SUCCESS;
+        break;
+    
+    default:
+        return SUCCESS;
+        break;
+    }
+
+    return SUCCESS;
 }

@@ -1,0 +1,1 @@
+int scan_am_file(char *filename);

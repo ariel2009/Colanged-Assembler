@@ -6,8 +6,9 @@
  DATA = $(GBL)/Data/
  PRE_PCSR = ./Preproccessor/
  ERR_H = ./ErrorHandling/
+ FIRST_PASS = ./first_pass/
  GLOBAL_DEPS = $(GBL)defines.h # Dependencies for everything
- EXE_DEPS = assembler.o  util.o tables.o mcro_expan.o Errors.o structures.o FileHandler.o # Deps for exe
+ EXE_DEPS = assembler.o  util.o tables.o mcro_expan.o Errors.o structures.o FileHandler.o main_pass.o extern_and_entry.o # Deps for exe
 
  ## Executable
 assembler: $(EXE_DEPS) $(GLOBAL_DEPS)
@@ -33,6 +34,12 @@ structures.o: $(OUT_P) $(GLOBAL_DEPS)
 
 FileHandler.o: $(OUT_P) $(GLOBAL_DEPS)
 	$(CC) -c ./IO/FileHandler.c $(CFLAGS) -o $@
+
+main_pass.o: $(OUT_P) $(GLOBAL_DEPS)
+	$(CC) -c $(FIRST_PASS)main_pass.c $(CFLAGS) -o $@
+	
+extern_and_entry.o: $(OUT_P) $(GLOBAL_DEPS)
+	$(CC) -c $(FIRST_PASS)/instruction_handle/extern_and_entry.c $(CFLAGS) -o $@
 
 clean:
 	rm -rf assembler *.o *.am *.ob *.ent *.ext

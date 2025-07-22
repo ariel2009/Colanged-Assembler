@@ -2,6 +2,11 @@
 #define REG_COUNT 8
 #define INST_COUNT 5
 
+typedef enum TABLE_TYPE{
+    EXTERN_OR_ENTRY,
+    LABEL
+} TABLE_TYPE;
+
 typedef struct command_def{
     char *name;
     unsigned int opcode: 4;
@@ -26,3 +31,4 @@ typedef struct instruction{
 int isRegister(char *possibleReg);
 int isCommand(char *possibleCmd);
 int isInstruct(char *possibleInst);
+int add_to_table(instruction *inst_data, int type);
