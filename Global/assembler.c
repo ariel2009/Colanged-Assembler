@@ -22,7 +22,7 @@ int main(int argc, char const *argv[])
         if(try_add_file(fileName, SRC_FILE_EXT) && prepare_no_extra_spaces_file(fileName, SRC_FILE_EXT)){
             status = expand_macro(fileName, no_extra_spaces_f_name);
             if(status){
-                /* Test */
+                /* --TEST-- */
                 status = scan_am_file("example.am");
             }
         }

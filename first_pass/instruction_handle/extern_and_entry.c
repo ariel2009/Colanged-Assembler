@@ -13,6 +13,7 @@ int handle_entry_or_extern(char *str){
     char *str_copy;
     char *inst_type_tok, *label_tok;
     int type;
+    instruction *inst_to_add;
 
     str_copy = malloc(strlen(str) +1);
     strcpy(str_copy, str);
@@ -31,15 +32,28 @@ int handle_entry_or_extern(char *str){
             return ERROR;
         }
 
-        label_tok = strtok(NULL, "n");
+        label_tok = strtok(NULL, "\n");
         if(label_tok == NULL){
             /* print corresponding error */
             return ERROR;
         }
 
         /* Label validation */
-        /* Create instruction object and set values */
-        /* Use "add_table" for this instruction */
+
+        inst_to_add = (instruction *)malloc(sizeof(instruction));
+        if (inst_to_add == NULL)
+        {
+            /*Print correspondeing error*/
+            return ERROR;
+        }
+        
+        inst_to_add->is_extern = type;
+        inst_to_add->label = label_tok;
+        inst_to_add->nums = NULL;
+        inst_to_add->arg_label=NULL;
+        inst_to_add->length = 0;
+        
+        add_to_table(inst_to_add, EXTERN_OR_ENTRY);
     }
     return SUCCESS;
 }

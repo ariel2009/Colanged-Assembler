@@ -30,7 +30,8 @@ char *instructions[] =
 
 char *registers[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 
-instruction entries[], externs[];
+instruction *entries, *externs;
+int externs_count = 0, entries_count = 0;
 
 int isInstruct(char *possibleInst){
     int i;
@@ -65,17 +66,31 @@ int isRegister(char *possibleReg){
     return macros;
 }*/
 
-/* Go ahead from here */
 int add_to_table(instruction *inst_data, int type){
+
     switch (type)
     {
     case  EXTERN_OR_ENTRY:
         if (inst_data->is_extern)
         {
-            /* Add to externs table */
+            externs = (instruction *)realloc(externs, (externs_count + 1)*sizeof(instruction));
+            /*Check if NULL*/
+            
+            memcpy(externs + externs_count++, inst_data, sizeof(instruction));
+            free(inst_data);
+
+            /* --TEST-- */
+            printf("from: add_to_table - extern after insert - label: %s\n", (externs + externs_count-1)->label);
             return SUCCESS;
         }
-        /* Add to entries table */
+        entries = (instruction *)realloc(entries, (entries_count + 1)*sizeof(instruction));
+        /*Check if NULL*/
+
+        memcpy(entries + entries_count++, inst_data, sizeof(instruction));
+        free(inst_data);
+            
+        /* --TEST-- */
+        printf("from: add_to_table - entry after insert - label: %s\n", (entries + entries_count-1)->label);
         return SUCCESS;
         break;
     
