@@ -1,9 +1,8 @@
-
 #include <string.h>
 #include <stdlib.h>
 
 #include "../ErrorHandling/Errors.h"
-#include "FileHandler.h"
+#include "file_handler.h"
 #include "../Global/defines.h"
 #include "../Global/util.h"
 
@@ -22,10 +21,9 @@ int is_extension_valid(char *fullName, char *allowed_ext){
 
 int copy_file(char *src_file_name, char *dest_file_name, char* (*skip_until)(char *), char* (*exchange)(char *)){
     FILE *src, *dest;
-    char buff[MAX_LINE_LENGTH];
-    char *dest_buff;
+    char buff[MAX_LINE_LENGTH], *buff_copy;
     char *exchanged_str, *end_skip_str, *token;
-    int skip_state = STATE_OUT, in_regular_content = STATE_OUT;
+    int skip_state = STATE_OUT, in_content = STATE_OUT;
     int is_skip = skip_until != NULL, is_exchanged = exchange != NULL;
 
     src = fopen(src_file_name, "r");
@@ -40,51 +38,36 @@ int copy_file(char *src_file_name, char *dest_file_name, char* (*skip_until)(cha
         return ERROR;
     }
 
-    while(fgets(buff, MAX_LINE_LENGTH, src)){        
-        if(skip_state == STATE_OUT){
-            if(is_skip && (end_skip_str = skip_until(buff)) != NULL){
-                skip_state = STATE_IN;
-            }
-            else {
-                if(is_exchanged && (exchanged_str = exchange(buff)) != NULL){
-                    if(in_regular_content == STATE_IN){
+    while(fgets(buff, MAX_LINE_LENGTH, src)){
+        buff_copy = remove_extra_spaces_copy(buff);  
+        if(buff_copy != NULL && strcmp(buff_copy, "\0") != 0){
+            if(skip_state == STATE_OUT){
+                if(is_skip && (end_skip_str = skip_until(buff_copy)) != NULL){
+                    skip_state = STATE_IN;
+                }
+                else {
+                    if(in_content){
                         putc('\n', dest);
                     }
-                    fprintf(dest, exchanged_str, "%s");
-                }
-                else{
-                    dest_buff = removeExtraSpaces(buff);
-                    if(dest_buff != NULL){
-                        if(in_regular_content == STATE_IN){
-                            putc('\n', dest);
-                        }
-                        fprintf(dest, dest_buff, "%s");
+                    if(is_exchanged && (exchanged_str = exchange(buff_copy)) != NULL){
+                        fprintf(dest, exchanged_str, "%s");
                     }
+                    else{
+                        fprintf(dest, buff_copy, "%s");
+                    }
+                    in_content = STATE_IN;
                 }
-                in_regular_content = STATE_IN;
             }
-        }
-        else if(end_skip_str != NULL){
-                token = strtok(buff, "\n");
+            else if(end_skip_str != NULL){
+                token = strtok(buff_copy, "\n");
                 if(strcmp(token, end_skip_str) == 0){
-                    in_regular_content = STATE_OUT;
                     skip_state = STATE_OUT;
                 }
+            }
         }
     }
     fclose(src);
     fclose(dest);
-    return SUCCESS;
-}
-
-int prepare_no_extra_spaces_file(char *filename, char *ext){
-
-    /*if(is_extension_valid(filename, ext) &&\
-        copy_file(filename, TMP_FILE_NAME, NULL, removeExtraSpaces)){
-            return SUCCESS;
-    }*/
-    if(!copy_file(filename, TMP_FILE_NAME, NULL, removeExtraSpaces))
-        return ERROR; 
     return SUCCESS;
 }
 
@@ -120,17 +103,3 @@ int try_add_file(char *filename, char *exten){
     fclose(fp);
     return SUCCESS;
 }
-/*int count_spaces_lines(FILE *file_with_spaces){
-    char *buff_of_src;
-    int space_line = STATE_IN, spaces_count = 0;
-    buff_of_src = malloc(MAX_LINE_LENGTH);
-
-    while(fgets(buff_of_src, MAX_LINE_LENGTH, file_with_spaces) && space_line){
-        if(removeExtraSpaces(buff_of_src) != NULL){
-            space_line = STATE_OUT;
-        }
-        spaces_count++;
-    }
-    return spaces_count;
-    free(buff_of_src);
-}*/

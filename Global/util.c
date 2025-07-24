@@ -35,7 +35,7 @@ int isExtraText(char *str){
     return strchr(str, '\t') || strchr(str, ' ');
 }
 
-int is_tok_in_str(char *str, char *tok){
+/*int is_tok_in_str(char *str, char *tok){
     char *str_copy = (char *)malloc(strlen(str) + 1);
     char *token_iter;
     
@@ -52,7 +52,7 @@ int is_tok_in_str(char *str, char *tok){
 
     free(str_copy);
     return ERROR;
-}
+}*/
 
 int get_line_count(char *content){
 
@@ -78,4 +78,34 @@ int get_line_count(char *content){
 
 char* returnNull(char *whatever){
     return NULL;
+}
+
+char *remove_extra_spaces_copy(char *str){
+    char *str_copy, *token;
+    char *out_str;
+    if(str == NULL){
+        /* print corresponding error */
+        return NULL;
+    }
+    
+    str_copy = malloc(strlen(str) +1);
+    out_str = malloc(strlen(str) +1);
+
+    strcpy(str_copy, str);
+    strcpy(out_str, "\0");
+
+    token = strtok(str_copy, " \t\n");
+    if(token != NULL){
+        strcat(out_str, token);
+        token = strtok(NULL, " \t\n");
+        while (token != NULL)
+        {
+            strcat(out_str, " ");
+            strcat(out_str, token);
+            token = strtok(NULL, " \t\n");
+        }
+    }
+    
+    free(str_copy);
+    return out_str;
 }

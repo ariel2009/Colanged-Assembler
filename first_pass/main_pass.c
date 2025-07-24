@@ -2,7 +2,7 @@
 
 #include "main_pass.h"
 #include "./instruction_handle/extern_and_entry.h"
-#include "../IO/FileHandler.h"
+#include "../IO/file_handler.h"
 #include "../Global/defines.h"
 
 int scan_am_file(char *filename){

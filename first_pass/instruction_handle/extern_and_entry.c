@@ -1,10 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* -- TEST --
-#include <stdio.h>
-*/
-
 #include "extern_and_entry.h"
 #include "../../Global/defines.h"
 #include "../../Global/Data/tables.h"
