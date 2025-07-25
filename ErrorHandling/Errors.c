@@ -25,6 +25,8 @@ Error mcro_errors[] ={
     {ERR_CODE_16, "Error - extra text after macro name definition"}
 };
 
+/* Add More Errors */
+
 void print_mcro_err(location *loc, unsigned short err_code){
     if(loc == NULL)
         print_independed_err(err_code, mcro_errors, sizeof(general_errors) / sizeof(Error)+1);

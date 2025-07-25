@@ -1,18 +1,20 @@
 #include <string.h>
 
+#include "../Global/Data/tables.h"
 #include "main_pass.h"
-#include "./instruction_handle/extern_and_entry.h"
+#include "handle_instruction.h"
 #include "../IO/file_handler.h"
 #include "../Global/defines.h"
 
 int scan_am_file(char *filename){
-    int success = 0;
+    int IC = 0, DC = 0;
+    int status = 1;
     /*Use add_file from FileHandler to validatefile name*/
 
     FILE *am_file = fopen(filename, "r");
     /*
-        Validate file is not null.
-        Validate there is no over-length line
+        --Validate file is not null.
+        --Validate there is no over-length line
     */
 
     char line[MAX_LINE_LENGTH];
@@ -21,8 +23,14 @@ int scan_am_file(char *filename){
     while (fgets(line, MAX_LINE_LENGTH, am_file) != NULL)
     {
         strcpy(line_copy, line);
-        success = handle_entry_or_extern(line_copy);
+
+        if(strstr(line_copy, ".extern") != NULL || strstr(line_copy, ".entry") != NULL){
+            status = read_entry_or_extern(line_copy);
+        }
+        else if(strstr(line_copy, ".data") != NULL || strstr(line_copy, ".string") != NULL){
+            read_str_data(line_copy, &DC);
+        }
     }
 
-    return success;
+    return status;
 }

@@ -28,7 +28,14 @@ typedef struct instruction{
     unsigned int is_extern: 1;
 } instruction;
 
+typedef struct label{
+    char *name;
+    int type;
+    int address;
+} label;
+
 int isRegister(char *possibleReg);
 int isCommand(char *possibleCmd);
 int isInstruct(char *possibleInst);
-int add_to_table(instruction *inst_data, int type);
+int add_extern_or_entry(instruction *inst_data);
+int add_label(label *input_label);

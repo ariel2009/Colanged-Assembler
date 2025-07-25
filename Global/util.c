@@ -32,7 +32,7 @@ char *removeExtraSpaces(char *str){
 }
 
 int isExtraText(char *str){
-    return strchr(str, '\t') || strchr(str, ' ');
+    return strchr(str, '\t') != NULL || strchr(str, ' ') != NULL;
 }
 
 /*int is_tok_in_str(char *str, char *tok){
@@ -108,4 +108,23 @@ char *remove_extra_spaces_copy(char *str){
     
     free(str_copy);
     return out_str;
+}
+
+int legal_label_or_mcro(char *label_or_mcro){
+    char c;
+    int i;
+    if(!isalpha(*(label_or_mcro))){
+        /* print error of illegal label */
+        return ERROR;
+    }
+
+    i = 1;
+    while((c = *(label_or_mcro + i++)) != '\0'){
+        if(!isalpha(c) && !isdigit(c)){
+            /* print error of illegal label */
+            return ERROR;
+        }
+    }
+
+    return SUCCESS;
 }

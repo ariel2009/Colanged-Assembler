@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include "defines.h"
@@ -10,6 +11,7 @@ int main(int argc, char const *argv[])
 {
     int status = SUCCESS;
     int i;
+    char *am_file_name;
     if(argc <= 1){
         status = ERROR;
         printf("Usage: ./assembler file1 file2.as ...\n");
@@ -20,8 +22,13 @@ int main(int argc, char const *argv[])
         strcpy(fileName, argv[i]);
 
         if(try_add_file(fileName, SRC_FILE_EXT)){
-            status = expand_macro(fileName);
+            am_file_name = expand_macro(fileName);
         }
+
+        if(am_file_name != NULL){
+            scan_am_file(am_file_name);
+        }
+        
         free(fileName);
     }
     

@@ -11,11 +11,12 @@
 
 hashMap *macro_list;
 
-int expand_macro(char *src_file_name){
+char *expand_macro(char *src_file_name){
     int status = SUCCESS, isInMcro = STATE_OUT, err_code = 0;
     int mcroLinesCount = 0, lineCount = 0;
     char buff[MAX_LINE_LENGTH], *buff_copy;
     char *mcro_name, *token;
+    char *expanded_file_name;
 
     FILE *src;
     fpos_t *mcro_start, *pos_copy;
@@ -24,7 +25,7 @@ int expand_macro(char *src_file_name){
     src = fopen(src_file_name, "r");
     if(src == NULL){
         print_general_err(NULL, ERR_CODE_8);
-        return ERROR;
+        return NULL;
     }
     
     macro_list = (hashMap *)malloc(sizeof(hashMap));
@@ -86,12 +87,15 @@ int expand_macro(char *src_file_name){
         }
     }
     
-    if(status != ERROR){
-        status = expan_and_remove_defs(src_file_name);
+    if(status == SUCCESS){
+        if((expanded_file_name =expan_and_remove_defs(src_file_name)) == NULL)
+            return NULL;
+        return expanded_file_name;
     }
     fclose(src);
     free(macro_list);
-    return status;
+
+    return NULL;
 }
 
 int validate_mcro_name(char *mcro_name){
@@ -103,6 +107,8 @@ int validate_mcro_name(char *mcro_name){
     if(isCommand(mcro_name) || isInstruct(mcro_name) || isRegister(mcro_name)){
         return ERR_CODE_11;
     }
+
+    /* Validate Like Label */
 
     if(search(macro_list, mcro_name) != NULL){
         return ERR_CODE_13;
@@ -178,7 +184,7 @@ char *exchange_if_mcro_name(char *line){
     return NULL;
 }
 
-int expan_and_remove_defs(char *src_file_name){
+char *expan_and_remove_defs(char *src_file_name){
     char *new_file_name;
 
     new_file_name = malloc(strlen(src_file_name) + 1);
@@ -188,9 +194,8 @@ int expan_and_remove_defs(char *src_file_name){
     strcat(new_file_name, ".am");
 
     if(!copy_file(src_file_name, new_file_name, skip_until_mcroend, exchange_if_mcro_name)){
-        return ERROR;
+        return NULL;
     }
 
-    free(new_file_name);
-    return SUCCESS;
+    return new_file_name;
 }

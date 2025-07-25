@@ -31,7 +31,9 @@ char *instructions[] =
 char *registers[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 
 instruction *entries, *externs;
-int externs_count = 0, entries_count = 0;
+label *label_table;
+
+int externs_count = 0, entries_count = 0, labels_count = 0;
 
 int isInstruct(char *possibleInst){
     int i;
@@ -66,38 +68,38 @@ int isRegister(char *possibleReg){
     return macros;
 }*/
 
-int add_to_table(instruction *inst_data, int type){
-
-    switch (type)
+int add_extern_or_entry(instruction *inst_data){
+    if (inst_data->is_extern)
     {
-    case  EXTERN_OR_ENTRY:
-        if (inst_data->is_extern)
-        {
-            externs = (instruction *)realloc(externs, (externs_count + 1)*sizeof(instruction));
-            /*Check if NULL*/
-            
-            memcpy(externs + externs_count++, inst_data, sizeof(instruction));
-            free(inst_data);
-
-            /* --TEST-- */
-            printf("from: add_to_table - extern after insert - label: %s\n", (externs + externs_count-1)->label);
-            return SUCCESS;
-        }
-        entries = (instruction *)realloc(entries, (entries_count + 1)*sizeof(instruction));
+        externs = (instruction *)realloc(externs, (externs_count + 1)*sizeof(instruction));
         /*Check if NULL*/
-
-        memcpy(entries + entries_count++, inst_data, sizeof(instruction));
+        
+        memcpy(externs + externs_count++, inst_data, sizeof(instruction));
         free(inst_data);
-            
-        /* --TEST-- */
-        printf("from: add_to_table - entry after insert - label: %s\n", (entries + entries_count-1)->label);
+
         return SUCCESS;
-        break;
-    
-    default:
-        return SUCCESS;
-        break;
     }
+    entries = (instruction *)realloc(entries, (entries_count + 1)*sizeof(instruction));
+    /*Check if NULL*/
+
+    memcpy(entries + entries_count++, inst_data, sizeof(instruction));
+    free(inst_data);
+        
+    return SUCCESS;
+}
+
+int add_label(label *input_label){
+    label_table = (label *)realloc(label_table, (labels_count + 1)*sizeof(instruction));
+    if(label_table == NULL){
+        /* print cannot allocat error */
+        return ERROR;
+    }
+
+    memcpy(label_table + labels_count++, input_label, sizeof(label));
+    free(input_label);
+    
+    /* TEST */
+    printf("from add_label: label name:%s, address: %d", (label_table+labels_count-1)->name, (label_table+labels_count-1)->address);
 
     return SUCCESS;
 }

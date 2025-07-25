@@ -39,7 +39,7 @@ main_pass.o: $(OUT_P) $(GLOBAL_DEPS)
 	$(CC) -c $(FIRST_PASS)main_pass.c $(CFLAGS) -o $@
 	
 extern_and_entry.o: $(OUT_P) $(GLOBAL_DEPS)
-	$(CC) -c $(FIRST_PASS)/instruction_handle/extern_and_entry.c $(CFLAGS) -o $@
+	$(CC) -c $(FIRST_PASS)/handle_instruction.c $(CFLAGS) -o $@
 
 clean:
 	rm -rf assembler *.o *.am *.ob *.ent *.ext
