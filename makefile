@@ -8,7 +8,7 @@
  ERR_H = ./ErrorHandling/
  FIRST_PASS = ./first_pass/
  GLOBAL_DEPS = $(GBL)defines.h # Dependencies for everything
- EXE_DEPS = assembler.o  util.o tables.o mcro_expan.o Errors.o structures.o file_handler.o main_pass.o extern_and_entry.o # Deps for exe
+ EXE_DEPS = assembler.o util.o tables.o mcro_expan.o Errors.o structures.o file_handler.o main_pass.o handle_instruction.o # Deps for exe
 
  ## Executable
 assembler: $(EXE_DEPS) $(GLOBAL_DEPS)
@@ -38,8 +38,8 @@ file_handler.o: $(OUT_P) $(GLOBAL_DEPS)
 main_pass.o: $(OUT_P) $(GLOBAL_DEPS)
 	$(CC) -c $(FIRST_PASS)main_pass.c $(CFLAGS) -o $@
 	
-extern_and_entry.o: $(OUT_P) $(GLOBAL_DEPS)
-	$(CC) -c $(FIRST_PASS)/handle_instruction.c $(CFLAGS) -o $@
+handle_instruction.o: $(OUT_P) $(GLOBAL_DEPS)
+	$(CC) -c $(FIRST_PASS)handle_instruction.c $(CFLAGS) -o $@
 
 clean:
 	rm -rf assembler *.o *.am *.ob *.ent *.ext

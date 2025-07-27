@@ -1,15 +1,17 @@
 #include <string.h>
+#include <stdlib.h>
 
 #include "../Global/Data/tables.h"
 #include "main_pass.h"
 #include "handle_instruction.h"
 #include "../IO/file_handler.h"
 #include "../Global/defines.h"
+#include "../Global/util.h"
 
 int scan_am_file(char *filename){
     int IC = 0, DC = 0;
     int status = 1;
-    /*Use add_file from FileHandler to validatefile name*/
+    /*Use add_file from FileHandler to validate file name*/
 
     FILE *am_file = fopen(filename, "r");
     /*

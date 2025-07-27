@@ -76,6 +76,9 @@ int add_extern_or_entry(instruction *inst_data){
         
         memcpy(externs + externs_count++, inst_data, sizeof(instruction));
         free(inst_data);
+        
+        /* TEST */
+        /*printf("from: add_to_table - extern after insert - label: %s\n", (externs + externs_count-1)->label);*/
 
         return SUCCESS;
     }
@@ -84,6 +87,9 @@ int add_extern_or_entry(instruction *inst_data){
 
     memcpy(entries + entries_count++, inst_data, sizeof(instruction));
     free(inst_data);
+
+    /* TEST */
+    /*printf("from: add_to_table - entry after insert - label: %s\n", (entries + entries_count-1)->label);*/
         
     return SUCCESS;
 }
@@ -99,7 +105,7 @@ int add_label(label *input_label){
     free(input_label);
     
     /* TEST */
-    printf("from add_label: label name:%s, address: %d", (label_table+labels_count-1)->name, (label_table+labels_count-1)->address);
+    /*printf("from add_label: label name: %s, address: %d\n", (label_table+labels_count-1)->name, (label_table+labels_count-1)->address);*/
 
     return SUCCESS;
 }

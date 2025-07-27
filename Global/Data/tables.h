@@ -34,6 +34,11 @@ typedef struct label{
     int address;
 } label;
 
+typedef struct segment{
+    unsigned short num;
+    label *associated_lbl; 
+} segment;
+
 int isRegister(char *possibleReg);
 int isCommand(char *possibleCmd);
 int isInstruct(char *possibleInst);

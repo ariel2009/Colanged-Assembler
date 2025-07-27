@@ -113,8 +113,14 @@ char *remove_extra_spaces_copy(char *str){
 int legal_label_or_mcro(char *label_or_mcro){
     char c;
     int i;
-    if(!isalpha(*(label_or_mcro))){
+    if(label_or_mcro == NULL || isExtraText(label_or_mcro)\
+     || !isalpha(*(label_or_mcro))){
         /* print error of illegal label */
+        return ERROR;
+    }
+
+    if(strlen(label_or_mcro) > MAX_LABEL_LENGTH){
+        /* print label is too long error */
         return ERROR;
     }
 
@@ -124,6 +130,32 @@ int legal_label_or_mcro(char *label_or_mcro){
             /* print error of illegal label */
             return ERROR;
         }
+    }
+
+    return SUCCESS;
+}
+
+int is_valid_num(char *str){
+    char *str_copy;
+    char c;
+    int i = 0, num;
+
+    str_copy = malloc(strlen(str) + 1);
+    strcpy(str_copy, str);
+
+    while((c = *(str_copy + i)) != '\0'){
+        if(!isdigit(c)){
+            /* error not a num */
+            return ERROR;
+        }
+    }
+    
+    strcpy(str_copy, str);
+
+    num = atoi(str_copy);
+    if(num > MAX_NUM || num < MIN_NUM){
+        /* error out of bounds num */
+        return ERROR;
     }
 
     return SUCCESS;
