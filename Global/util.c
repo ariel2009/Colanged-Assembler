@@ -145,14 +145,16 @@ int is_valid_num(char *str){
 
     while((c = *(str_copy + i)) != '\0'){
         if(!isdigit(c)){
-            /* error not a num */
             return ERROR;
         }
+        i++;
     }
-    
-    strcpy(str_copy, str);
 
     num = atoi(str_copy);
+
+    /* TEST */
+    printf("from is_valid_num: str_copy: %s\n", str_copy);
+
     if(num > MAX_NUM || num < MIN_NUM){
         /* error out of bounds num */
         return ERROR;

@@ -71,6 +71,7 @@ int read_entry_or_extern(char *str){
     return SUCCESS;
 }
 
+/* Edge Cases */
 int read_str_data(char *str, int *DC){
     char *str_copy, *token;
     label *data_label;
@@ -107,7 +108,7 @@ int read_str_data(char *str, int *DC){
 
     if(strcmp(token, ".data") == 0){
         token = strtok(NULL, "\n");
-        if(!read_nums(inst, token)){
+        if(!read_nums(&inst, token)){
             return ERROR;
         }
     }
@@ -115,49 +116,48 @@ int read_str_data(char *str, int *DC){
     return SUCCESS;
 }
 
+/* Re-Check edge cases */
+/* Syntax Issue: Connot declare this func in the header file */
 int read_nums(instruction **data, char *str){
     char *str_copy, *token;
     int i = 0;
-
+    short *dest_nums;
     
     if(str == NULL){
         /* No nums provided error */
         return ERROR;
     }
-
     str_copy = malloc(strlen(str) + 1);
     strcpy(str_copy, str);
     if(str_copy == NULL){
         /* print error memory cannot be allocated */
         return ERROR;
     }
+    /* validate there is no pre-comma */
 
-    if(strstr(str_copy, ",")){
-        token = strtok(str_copy, " ,");
+    if(strchr(str_copy, ',') != NULL){
+        token = strtok(str_copy, ",");
         if(token == NULL){
             /* error comma before number */
             return ERROR;
         }
-        /* TEST */
-        printf("from read_nums: token is: %s\n", token);
-        
-        while(token != NULL && strchr(str + (token-str_copy), ',') != NULL){
-            /* TEST */
-            printf("from read_nums: number: %s\n", token);
+        dest_nums = malloc(sizeof(short));
 
-            token = strtok(NULL, ", ");
-            /*if(!is_valid_num(token)){
+        while(token != NULL){
+
+            if(!is_valid_num(token)){
                 return ERROR;
             }
-
-            (*data)->nums[i] = atoi(token);*/
+            dest_nums = realloc(dest_nums, (i+1)*sizeof(short));
+            (*data)->nums = dest_nums;
+            *(dest_nums + i) = atoi(token);
             i++;
-        }
-        token = strtok(NULL, " \n");
-        if(token == NULL){
-            /* error comma found after last number */
-            return ERROR;
+            token = strtok(NULL, ", \n");
+
+            /* TEST */
+            printf("from read_nums: nums + i: %d\n", (*data)->nums[i-1]);
         }
     }
+    /* validate ther is no post-comma */
     return SUCCESS;
 }

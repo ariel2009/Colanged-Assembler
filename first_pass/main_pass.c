@@ -36,3 +36,7 @@ int scan_am_file(char *filename){
 
     return status;
 }
+
+/*int insert_data_segment(int *DC, unsigned short *data){
+    
+}*/

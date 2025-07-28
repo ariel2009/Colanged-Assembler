@@ -36,7 +36,7 @@ typedef struct label{
 
 typedef struct segment{
     unsigned short num;
-    label *associated_lbl; 
+    char *associated_lbl; 
 } segment;
 
 int isRegister(char *possibleReg);
