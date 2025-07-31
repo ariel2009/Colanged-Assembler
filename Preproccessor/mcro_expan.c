@@ -34,7 +34,10 @@ char *expand_macro(char *src_file_name){
     while(fgets(buff, MAX_LINE_LENGTH, src) != NULL){
         /*lineCount += count_spaces_lines(src) + 1; */
         lineCount++;
-        buff_copy = remove_extra_spaces_copy(buff);
+
+        buff_copy = malloc(strlen(buff) + 1);
+        strcpy(buff_copy, buff);
+        remove_extra_spaces(buff_copy);
 
         if(buff_copy != NULL && strcmp(buff_copy, "\0") != 0){
             token = strtok(buff_copy, " \t\n");
@@ -61,7 +64,9 @@ char *expand_macro(char *src_file_name){
                 }
             }
             else{
-                buff_copy = remove_extra_spaces_copy(buff);
+                strcpy(buff_copy, buff);
+                remove_extra_spaces(buff_copy);
+                
                 token = strtok(buff_copy, " \t\n");
 
                 if(strcmp(token, MCRO_DECL_TOK) == 0){
@@ -85,6 +90,7 @@ char *expand_macro(char *src_file_name){
                 }
             }
         }
+        free(buff_copy);
     }
     
     if(status == SUCCESS){

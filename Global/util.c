@@ -110,6 +110,33 @@ char *remove_extra_spaces_copy(char *str){
     return out_str;
 }
 
+void remove_extra_spaces(char *str){
+    char *str_copy, *token;
+    char *out_str = str;
+    
+    str_copy = malloc(strlen(str) +1);
+
+    if(str == NULL){
+        str = "\0";
+    }
+    strcpy(str_copy, str);
+    strcpy(out_str, "\0");
+
+    token = strtok(str_copy, " \t\n");
+    if(token != NULL){
+        strcat(out_str, token);
+        token = strtok(NULL, " \t\n");
+        while (token != NULL)
+        {
+            strcat(out_str, " ");
+            strcat(out_str, token);
+            token = strtok(NULL, " \t\n");
+        }
+    }
+
+    free(str_copy);
+}
+
 int legal_label_or_mcro(char *label_or_mcro){
     char c;
     int i;
@@ -142,9 +169,18 @@ int is_valid_num(char *str){
 
     str_copy = malloc(strlen(str) + 1);
     strcpy(str_copy, str);
-
+    if(*(str_copy) == '+' || *(str_copy) == '-'){
+        str_copy++;
+    }
+    if(*(str_copy) == '\0'){
+        printf("from is_valid_num: Illegal number\n");
+        return ERROR;
+    }
     while((c = *(str_copy + i)) != '\0'){
         if(!isdigit(c)){
+            /* TEST */
+            printf("from is_valid_num: Illegal number\n");
+
             return ERROR;
         }
         i++;
@@ -152,13 +188,25 @@ int is_valid_num(char *str){
 
     num = atoi(str_copy);
 
-    /* TEST */
-    printf("from is_valid_num: str_copy: %s\n", str_copy);
-
     if(num > MAX_NUM || num < MIN_NUM){
         /* error out of bounds num */
         return ERROR;
     }
 
     return SUCCESS;
+}
+
+int count_chr_occur(char *str, char chr){
+    char *str_copy, c;
+    int i = 0, count = 0;
+    str_copy = malloc(strlen(str) + 1);
+    strcpy(str_copy, str);
+
+    while((c = *(str_copy + i)) != '\0'){
+        if(c == chr){
+            count++;
+        }
+        i++;
+    }
+    return count;
 }

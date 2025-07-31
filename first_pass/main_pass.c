@@ -30,13 +30,13 @@ int scan_am_file(char *filename){
             status = read_entry_or_extern(line_copy);
         }
         else if(strstr(line_copy, ".data") != NULL || strstr(line_copy, ".string") != NULL){
-            read_str_data(line_copy, &DC);
+            read_str_data_copy(line_copy, &DC);
         }
     }
 
     return status;
 }
 
-/*int insert_data_segment(int *DC, unsigned short *data){
+int insert_data_segment(int *DC, unsigned short *data){
     
-}*/
+}

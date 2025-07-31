@@ -76,9 +76,6 @@ int add_extern_or_entry(instruction *inst_data){
         
         memcpy(externs + externs_count++, inst_data, sizeof(instruction));
         free(inst_data);
-        
-        /* TEST */
-        /*printf("from: add_to_table - extern after insert - label: %s\n", (externs + externs_count-1)->label);*/
 
         return SUCCESS;
     }

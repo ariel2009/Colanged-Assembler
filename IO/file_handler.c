@@ -39,7 +39,10 @@ int copy_file(char *src_file_name, char *dest_file_name, char* (*skip_until)(cha
     }
 
     while(fgets(buff, MAX_LINE_LENGTH, src)){
-        buff_copy = remove_extra_spaces_copy(buff);  
+        buff_copy = malloc(strlen(buff) + 1);
+        strcpy(buff_copy, buff);
+        remove_extra_spaces(buff_copy);
+
         if(buff_copy != NULL && strcmp(buff_copy, "\0") != 0){
             if(skip_state == STATE_OUT){
                 if(is_skip && (end_skip_str = skip_until(buff_copy)) != NULL){
@@ -65,6 +68,7 @@ int copy_file(char *src_file_name, char *dest_file_name, char* (*skip_until)(cha
                 }
             }
         }
+        free(buff_copy);
     }
     fclose(src);
     fclose(dest);
