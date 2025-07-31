@@ -143,12 +143,12 @@ int read_str_data_copy(char *str, int *DC){
 
     if((inst_start = strstr(str_copy, ".data")) != NULL || (inst_start = strstr(str_copy, ".string")) != NULL){
         token = strtok(inst_start, " ");
-        if(strcmp(token, ".data") != 0 && strcmp(token, ".string") != 0){
+        data = strtok(NULL, "\n");
+        if(strcmp(token, ".data") != 0 && strcmp(token, ".string") != 0 && count_chr_occur(data, '\"') == 2){
             /* TEST */
             printf("from read_str_data_copy: illegal instruction\n");
             return ERROR;
         }
-        data = strtok(NULL, "\n");
         if(str_copy != inst_start){ /* There is a potential label before */
             label_name = strtok(str_copy, ":");
             if(strlen(label_name) > (inst_start - str) || !legal_label_or_mcro(label_name)){ /* No semicolon or illegal label */
@@ -186,12 +186,17 @@ int read_str_data_copy(char *str, int *DC){
             if(!read_nums(&inst, data)){
                 return ERROR;
             }
+            /* Insert here into data segment */
+        }
+        else{
+            if(!read_str(&inst, data)){
+                return ERROR;
+            }
         }
     }
     return SUCCESS;
 }
 
-/* Re-Check edge cases */
 /* Syntax Issue: Connot declare this func in the header file */
 int read_nums(instruction **data, char *str){
     char *str_copy, *token;
@@ -215,12 +220,16 @@ int read_nums(instruction **data, char *str){
     while(token != NULL){
         str_copy = strtok(NULL, "");
         remove_extra_spaces(token);
+        if(*(token) == '\0'){ /* space char from comma to comma */
+            printf("from read_nums: error! extra comma\n");
+            return ERROR;
+        }
         if(isExtraText(token)){
             /* TEST */
             printf("from read_nums: extra text found");
             status = ERROR;
         }
-        if(!is_valid_num(token)){
+        else if(!is_valid_num(token)){
             status = ERROR;
         }
         dest_nums = realloc(dest_nums, (i+1)*sizeof(short));
@@ -239,7 +248,7 @@ int read_nums(instruction **data, char *str){
 }
 
 int read_str(instruction **inst, char *str){
-    char *str_copy, *start;
+    char *str_copy, *extracted_str, *start, *end, *token;
 
     /* Validate correct quotes */
     if(str == NULL){
@@ -249,5 +258,34 @@ int read_str(instruction **inst, char *str){
 
     str_copy = malloc(strlen(str) + 1);
     strcpy(str_copy, str);
+    printf("from read_str: str_copy: %s\n", str_copy);
+    if(count_chr_occur(str_copy, '\"') != 2){
+        /* TEST */
+        printf("from read_str: illegal string");
+        return ERROR;
+    }
+
+    start = strchr(str_copy, '\"');
+    if(start != str_copy){
+        /* TEST */
+        printf("from read_str: extra text before");
+        return ERROR;
+    }
+    
+    start++;
+    end = strrchr(str_copy, '\"');
+
+    extracted_str = malloc(end-start + 1);
+    strncpy(extracted_str, start, end-start);
+    
+    token = strtok(end, "\"");
+    if(token != NULL){
+        /* TEST */
+        printf("from read_str: error! extra text after\n");
+        return ERROR;
+    }
+    /* TEST */
+    printf("from read_str: extracted_str: %s\n", extracted_str);
+
     return SUCCESS;
 }

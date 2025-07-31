@@ -125,7 +125,14 @@ void remove_extra_spaces(char *str){
     token = strtok(str_copy, " \t\n");
     if(token != NULL){
         strcat(out_str, token);
-        token = strtok(NULL, " \t\n");
+        if(strchr(token, '\"') != NULL){
+            str_copy = strrchr(str_copy, '\"') + 1;
+            token = strtok(str_copy, " \t\n");
+        }
+        else{
+            token = strtok(NULL, " \t\n");
+        }
+
         while (token != NULL)
         {
             strcat(out_str, " ");
